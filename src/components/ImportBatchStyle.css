@@ -1,0 +1,100 @@
+/* ImportBatch.css */
+.import-batch-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.import-batch-title {
+  text-align: center;
+  font-size: 28px;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+.import-batch-form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 30px;
+}
+
+.upload-button {
+  background-color: red;
+  color: white;
+  padding: 10px 24px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s;
+}
+
+.drop-zone {
+  border: 2px dashed #ccc;
+  border-radius: 8px;
+  padding: 30px;
+  text-align: center;
+  cursor: pointer;
+  max-width: 300px;
+  background-color: #fafafa;
+  transition: background-color 0.3s;
+  position: relative;
+}
+
+.drop-zone.active {
+  background-color: #f0f8ff;
+  border-color: #007bff;
+}
+
+.drop-zone p {
+  margin-top: 10px;
+  font-size: 16px;
+}
+
+.file-input {
+  display: none;
+}
+
+.file-icon {
+  font-size: 32px;
+  color: #555;
+}
+
+
+.upload-button:hover {
+  background-color: #ff3030;
+}
+
+.preview-section {
+  margin-top: 20px;
+}
+
+.preview-title {
+  font-size: 22px;
+  margin-bottom: 10px;
+}
+
+.preview-table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: white;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.preview-table th,
+.preview-table td {
+  border: 1px solid #ddd;
+  padding: 10px;
+  text-align: left;
+}
+
+.preview-table th {
+  background-color: #f2f2f2;
+  font-weight: bold;
+}
+
+.preview-table tr:hover {
+  background-color: #f9f9f9;
+}

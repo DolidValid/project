@@ -1,0 +1,98 @@
+.sidebar {
+ height: 100vh;
+  width: 250px;
+  background-color: #ffffff;
+  border-right: 1px solid #e0e0e0;
+  padding: 20px;
+  position: fixed;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  z-index: 1000;
+  transition: transform 0.3s ease;
+}
+
+@media (max-width: 767.98px) {
+  .sidebar {
+    transform: translateX(-100%);
+    border-right: none;
+    border-left: 1px solid #e0e0e0;
+  }
+  
+  .sidebar.show {
+    transform: translateX(0);
+  }
+}
+
+/* The rest of your existing CSS remains exactly the same */
+.logo {
+  font-size: 24px;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 40px;
+}
+
+
+.logo-img {
+  width: 30px;
+  height: 30px;
+  margin-right: 10px;
+  vertical-align: middle;
+}
+
+
+.menu {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.menu li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 16px;
+  color: #333;
+  cursor: pointer;
+  padding: 10px;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.menu li:hover {
+  background-color: #f0f0f0;
+}
+
+.menu li.active {
+  background-color: #ff4d4f;
+  color: white;
+}
+
+.menu li.active .icon {
+  color: white;
+}
+
+.logout {
+  margin-top: 30px;
+  color: red;
+  font-weight: bold;
+}
+
+.submenu {
+  list-style: none;
+  padding-left: 30px;
+  margin: 5px 0 10px;
+}
+
+.submenu li {
+  font-size: 14px;
+  color: #555;
+  cursor: pointer;
+  margin: 4px 0;
+}
+
+.submenu li:hover {
+  text-decoration: underline;
+}
+
+.icon {
+  font-size: 16px;
+}
