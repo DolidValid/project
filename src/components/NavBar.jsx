@@ -28,13 +28,14 @@ function NavBar() {
     <>
       {/* Toggle button for small screens */}
       <button
-        className="btn btn-danger d-md-none m-2"
+        className="btn btn-danger d-md-none m-2 menu-toggle-btn"
         type="button"
         data-bs-toggle="offcanvas"
         data-bs-target="#sidebar"
         aria-controls="sidebar"
       >
-        ☰ Menu
+        <span className="menu-icon">☰</span>
+        <span className="menu-text">Menu</span>
       </button>
 
       {/* Sidebar (offcanvas on mobile, static on desktop) */}

@@ -7,7 +7,7 @@ import SetContractStatus from "./pages/Contract/SetContractStatus";
 import UpdateRatePlan from "./pages/Contract/UpdateRatePlan";
 import SetServiceStatus from "./pages/Services/SetServicStatus";
 import ActivateServiceParametre from "./pages/Services/ActivateServiceParametre";
-import Home from "./pages/home";
+import Home from "./pages/Home";
 import InfoFile from "./pages/InfoFile";
 
 function App() {
