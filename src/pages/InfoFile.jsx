@@ -35,8 +35,8 @@ const InfoFile = () => {
       setEmail("");
       setPhone("");
 
-      // Navigate after success
-      navigate("/create-contract");
+      // ✅ navigate immediately after success
+      navigate("/ImportBatch");
     } catch (error) {
       setMessage(`Error inserting data: ${error.message}`);
     } finally {
@@ -44,7 +44,6 @@ const InfoFile = () => {
     }
   };
 
-  //begin return
   return (
     <div
       className="container d-flex justify-content-center align-items-center"
@@ -90,7 +89,7 @@ const InfoFile = () => {
                 </label>
                 <input
                   id="email"
-                  type="email"
+                  type="text"
                   className="form-control"
                   placeholder="Enter email"
                   value={email}

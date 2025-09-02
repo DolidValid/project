@@ -9,6 +9,7 @@ import SetServiceStatus from "./pages/Services/SetServicStatus";
 import ActivateServiceParametre from "./pages/Services/ActivateServiceParametre";
 import Home from "./pages/Home";
 import InfoFile from "./pages/InfoFile";
+import ImportBatch from "./components/ImportBatch";
 
 function App() {
   return (
@@ -18,7 +19,7 @@ function App() {
 
         <Route element={<MainLayout />}>
           <Route path="/InfoFile" element={<InfoFile />} />
-
+          <Route path="/ImportBatch" element={<ImportBatch />} />
           <Route path="/home" element={<Home />} />
           <Route path="/create-contract" element={<CreateContract />} />
           <Route path="/set-contract-status" element={<SetContractStatus />} />
