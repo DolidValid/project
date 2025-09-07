@@ -35,8 +35,8 @@ const InfoFile = () => {
       setEmail("");
       setPhone("");
 
-      // ✅ navigate immediately after success
-      navigate("/ImportBatch");
+      // ✅ Pass phone to ImportBatch
+      navigate("/ImportBatch", { state: { phone } });
     } catch (error) {
       setMessage(`Error inserting data: ${error.message}`);
     } finally {
@@ -53,6 +53,7 @@ const InfoFile = () => {
         <div className="col-12 col-sm-10 col-md-6 col-lg-4 mx-auto">
           <div className="p-4 border rounded shadow bg-light">
             <form onSubmit={handleSubmit}>
+              {/* Inputs */}
               <div className="mb-3">
                 <label htmlFor="firstName" className="form-label">
                   First Name
@@ -61,7 +62,6 @@ const InfoFile = () => {
                   id="firstName"
                   type="text"
                   className="form-control"
-                  placeholder="Enter first name"
                   value={firstName}
                   onChange={(e) => setFirstName(e.target.value)}
                   required
@@ -76,7 +76,6 @@ const InfoFile = () => {
                   id="lastName"
                   type="text"
                   className="form-control"
-                  placeholder="Enter last name"
                   value={lastName}
                   onChange={(e) => setLastName(e.target.value)}
                   required
@@ -91,7 +90,6 @@ const InfoFile = () => {
                   id="email"
                   type="text"
                   className="form-control"
-                  placeholder="Enter email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
@@ -106,7 +104,6 @@ const InfoFile = () => {
                   id="phone"
                   type="text"
                   className="form-control"
-                  placeholder="Enter phone number"
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
                   required

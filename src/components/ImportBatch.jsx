@@ -1,16 +1,21 @@
-// eslint-disable-next-line no-unused-vars
-import React, { useState } from "react";
+import { useState } from "react";
+import { useLocation } from "react-router-dom";
 import * as XLSX from "xlsx";
 import { LuFileUp } from "react-icons/lu";
 import "bootstrap/dist/css/bootstrap.min.css";
 
 const ImportBatch = () => {
+  const location = useLocation();
+  const phoneFromInfoFile = location.state?.phone || ""; // ✅ retrieve phone passed from InfoFile
+
   const [file, setFile] = useState(null);
   const [previewData, setPreviewData] = useState([]);
   const [error, setError] = useState("");
   const [isDragActive, setIsDragActive] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [successCount, setSuccessCount] = useState(0);
 
-  // ✅ Safe file handler with validation
+  // File handler (same as before)
   const handleFile = (selectedFile) => {
     setError("");
     if (!selectedFile) return;
@@ -19,7 +24,7 @@ const ImportBatch = () => {
       "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
       "application/vnd.ms-excel",
     ];
-    const maxSize = 2 * 1024 * 1024; // 2MB
+    const maxSize = 2 * 1024 * 1024;
 
     if (!validTypes.includes(selectedFile.type)) {
       setError(
@@ -27,7 +32,6 @@ const ImportBatch = () => {
       );
       return;
     }
-
     if (selectedFile.size > maxSize) {
       setError("File is too large. Please upload a file smaller than 2MB.");
       return;
@@ -63,46 +67,70 @@ const ImportBatch = () => {
     handleFile(selectedFile);
   };
 
-  const handleDrop = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsDragActive(false);
-    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-      handleFile(e.dataTransfer.files[0]);
-      e.dataTransfer.clearData();
+    if (!file || previewData.length < 2) {
+      setError("Please select a valid file with data before uploading.");
+      return;
     }
-  };
 
-  const handleDragOver = (e) => {
-    e.preventDefault();
-    setIsDragActive(true);
-  };
+    setUploading(true);
+    setError("");
+    setSuccessCount(0);
 
-  const handleDragLeave = () => {
-    setIsDragActive(false);
-  };
+    const headers = previewData[0];
+    const rows = previewData.slice(1);
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (file) {
-      console.log("Submitting file:", file);
-      // Upload logic goes here (e.g., API call)
-    } else {
-      setError("Please select a file before uploading.");
+    for (const row of rows) {
+      if (!row || row.length === 0) continue;
+
+      const payload = {};
+      headers.forEach((header, i) => {
+        payload[header] = row[i];
+      });
+
+      // ✅ Inject phone from InfoFile as fileId
+      payload.fileId = phoneFromInfoFile;
+
+      try {
+        const res = await fetch("http://localhost:5000/api/users/active4G", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+
+        if (res.ok) {
+          setSuccessCount((prev) => prev + 1);
+        } else {
+          const errData = await res.json();
+          console.error("Insert failed:", errData);
+        }
+      } catch (err) {
+        console.error("API error:", err);
+      }
     }
+
+    setUploading(false);
   };
 
   return (
     <div className="container mt-4">
       <h2 className="mb-4">Import Batch</h2>
+      <p className="text-muted">
+        📱 Using File ID from phone: <strong>{phoneFromInfoFile}</strong>
+      </p>
 
       <form onSubmit={handleSubmit}>
         <div
           className={`border border-primary rounded p-4 text-center mb-3 ${
             isDragActive ? "bg-light" : ""
           }`}
-          onDrop={handleDrop}
-          onDragOver={handleDragOver}
-          onDragLeave={handleDragLeave}
+          onDrop={(e) => {
+            e.preventDefault();
+            handleFile(e.dataTransfer.files[0]);
+          }}
+          onDragOver={(e) => e.preventDefault()}
+          onDragLeave={() => setIsDragActive(false)}
         >
           <LuFileUp size={40} className="text-primary mb-2" />
           <p className="mb-2">
@@ -118,34 +146,14 @@ const ImportBatch = () => {
 
         {error && <div className="alert alert-danger">{error}</div>}
 
-        <button type="submit" className="btn btn-primary">
-          Upload
+        <button type="submit" className="btn btn-primary" disabled={uploading}>
+          {uploading ? "Uploading..." : "Upload"}
         </button>
       </form>
 
-      {previewData.length > 0 && (
-        <div className="mt-4">
-          <h4>Preview</h4>
-          <div className="table-responsive">
-            <table className="table table-bordered table-striped">
-              <thead className="table-light">
-                <tr>
-                  {previewData[0].map((headerCell, index) => (
-                    <th key={index}>{headerCell || `Column ${index + 1}`}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {previewData.slice(1, 6).map((row, rowIndex) => (
-                  <tr key={rowIndex}>
-                    {row.map((cell, cellIndex) => (
-                      <td key={cellIndex}>{cell}</td>
-                    ))}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+      {successCount > 0 && (
+        <div className="alert alert-success mt-3">
+          ✅ {successCount} rows inserted successfully!
         </div>
       )}
     </div>
