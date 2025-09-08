@@ -1,21 +1,46 @@
 import { useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import * as XLSX from "xlsx";
 import { LuFileUp } from "react-icons/lu";
 import "bootstrap/dist/css/bootstrap.min.css";
 
 const ImportBatch = () => {
   const location = useLocation();
-  const phoneFromInfoFile = location.state?.phone || ""; // ✅ retrieve phone passed from InfoFile
+  const navigate = useNavigate();
+  const phoneFromInfoFile = location.state?.phone || "";
 
   const [file, setFile] = useState(null);
   const [previewData, setPreviewData] = useState([]);
+  const [rowStatuses, setRowStatuses] = useState([]);
   const [error, setError] = useState("");
   const [isDragActive, setIsDragActive] = useState(false);
   const [uploading, setUploading] = useState(false);
-  const [successCount, setSuccessCount] = useState(0);
 
-  // File handler (same as before)
+  // ✅ Define mapping Excel header -> backend field
+  const fieldMapping = {
+    ID: "id",
+    MSISDN: "msisdn",
+    ACTION: "action",
+    SIGN_CONTRACT_3G_DATE: "signContractDate",
+    TEMPLATE_NAME: "templateName",
+    USER_LOGIN: "userLogin",
+    FILE_ID: "fileId",
+    NOTIFICATION_MSISDN: "notificationMsisdn",
+    NOTIFICATION_TEMPLATE: "notificationTemplate",
+    JOB_ID: "jobId",
+    PROMO: "promo",
+    CO_ID: "coId",
+  };
+
+  // ✅ Reset state
+  const handleClear = () => {
+    setFile(null);
+    setPreviewData([]);
+    setRowStatuses([]);
+    setError("");
+  };
+
+  // ✅ Handle file selection and parsing
   const handleFile = (selectedFile) => {
     setError("");
     if (!selectedFile) return;
@@ -55,6 +80,7 @@ const ImportBatch = () => {
         const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
 
         setPreviewData(jsonData);
+        setRowStatuses([]);
       } catch {
         setError("Error reading Excel file. Please check the file format.");
       }
@@ -67,6 +93,7 @@ const ImportBatch = () => {
     handleFile(selectedFile);
   };
 
+  // ✅ Handle upload with header mapping (keep empty values)
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!file || previewData.length < 2) {
@@ -74,22 +101,32 @@ const ImportBatch = () => {
       return;
     }
 
+    if (!phoneFromInfoFile) {
+      setError(
+        "File ID is missing. Please go back and provide a valid file ID."
+      );
+      return;
+    }
+
     setUploading(true);
     setError("");
-    setSuccessCount(0);
+    setRowStatuses([]);
 
     const headers = previewData[0];
     const rows = previewData.slice(1);
 
-    for (const row of rows) {
+    const statuses = [];
+
+    for (let i = 0; i < rows.length; i++) {
+      const row = rows[i];
       if (!row || row.length === 0) continue;
 
       const payload = {};
-      headers.forEach((header, i) => {
-        payload[header] = row[i];
+      headers.forEach((header, j) => {
+        const apiField = fieldMapping[header] || header;
+        payload[apiField] = row[j] !== undefined ? row[j] : "";
       });
 
-      // ✅ Inject phone from InfoFile as fileId
       payload.fileId = phoneFromInfoFile;
 
       try {
@@ -100,37 +137,101 @@ const ImportBatch = () => {
         });
 
         if (res.ok) {
-          setSuccessCount((prev) => prev + 1);
+          statuses.push({ row: i + 1, status: "success" });
         } else {
           const errData = await res.json();
-          console.error("Insert failed:", errData);
+          statuses.push({
+            row: i + 1,
+            status: "error",
+            message: errData.error || errData.message || "Insert failed",
+          });
         }
-      } catch (err) {
-        console.error("API error:", err);
+      } catch {
+        statuses.push({ row: i + 1, status: "error", message: "API error" });
       }
     }
 
+    setRowStatuses(statuses);
     setUploading(false);
+  };
+
+  const successCount = rowStatuses.filter((r) => r.status === "success").length;
+  const errorCount = rowStatuses.filter((r) => r.status === "error").length;
+  const allInserted = rowStatuses.length > 0 && errorCount === 0;
+
+  // ✅ Navigate to Activation Results page with fileId
+  const goToResults = () => {
+    navigate("/activation-results", {
+      state: { fileId: phoneFromInfoFile },
+    });
   };
 
   return (
     <div className="container mt-4">
       <h2 className="mb-4">Import Batch</h2>
       <p className="text-muted">
-        📱 Using File ID from phone: <strong>{phoneFromInfoFile}</strong>
+        📱 Using File ID from phone:{" "}
+        <strong>{phoneFromInfoFile || "Not provided"}</strong>
       </p>
 
+      {/* ✅ Toolbar with Upload / Clear / View Results + Summary */}
+      <div className="d-flex justify-content-between align-items-center mb-3">
+        <div className="d-flex gap-2">
+          <button
+            onClick={handleSubmit}
+            className="btn btn-primary"
+            disabled={uploading || !phoneFromInfoFile}
+          >
+            {uploading ? "Uploading..." : "Upload"}
+          </button>
+          <button
+            type="button"
+            className="btn btn-secondary"
+            onClick={handleClear}
+            disabled={uploading}
+          >
+            Clear File
+          </button>
+        </div>
+
+        {/* ✅ Insert Summary */}
+        {rowStatuses.length > 0 && (
+          <div>
+            <span className="badge bg-success me-2">
+              ✅ Success: {successCount}
+            </span>
+            <span className="badge bg-danger">❌ Errors: {errorCount}</span>
+          </div>
+        )}
+
+        {/* ✅ Only show if all rows inserted */}
+        {allInserted && (
+          <button
+            className="btn btn-success ms-3"
+            onClick={goToResults}
+            disabled={!phoneFromInfoFile}
+          >
+            View Activation Results →
+          </button>
+        )}
+      </div>
+
+      {/* ✅ File Drop Area */}
       <form onSubmit={handleSubmit}>
         <div
           className={`border border-primary rounded p-4 text-center mb-3 ${
             isDragActive ? "bg-light" : ""
           }`}
+          onDragOver={(e) => {
+            e.preventDefault();
+            setIsDragActive(true);
+          }}
+          onDragLeave={() => setIsDragActive(false)}
           onDrop={(e) => {
             e.preventDefault();
+            setIsDragActive(false);
             handleFile(e.dataTransfer.files[0]);
           }}
-          onDragOver={(e) => e.preventDefault()}
-          onDragLeave={() => setIsDragActive(false)}
         >
           <LuFileUp size={40} className="text-primary mb-2" />
           <p className="mb-2">
@@ -143,17 +244,46 @@ const ImportBatch = () => {
             className="form-control"
           />
         </div>
-
-        {error && <div className="alert alert-danger">{error}</div>}
-
-        <button type="submit" className="btn btn-primary" disabled={uploading}>
-          {uploading ? "Uploading..." : "Upload"}
-        </button>
       </form>
 
-      {successCount > 0 && (
-        <div className="alert alert-success mt-3">
-          ✅ {successCount} rows inserted successfully!
+      {error && <div className="alert alert-danger">{error}</div>}
+
+      {/* ✅ Preview Table */}
+      {previewData.length > 0 && (
+        <div className="mt-4">
+          <h5>Preview:</h5>
+          <div className="table-responsive">
+            <table className="table table-bordered table-sm">
+              <thead className="table-light">
+                <tr>
+                  {previewData[0].map((header, idx) => (
+                    <th key={idx}>
+                      {header}{" "}
+                      {fieldMapping[header] && `→ ${fieldMapping[header]}`}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {previewData.slice(1).map((row, i) => (
+                  <tr key={i}>
+                    {previewData[0].map((_, j) => (
+                      <td
+                        key={j}
+                        className={
+                          row[j] === null || row[j] === ""
+                            ? "table-warning"
+                            : ""
+                        }
+                      >
+                        {row[j] !== undefined ? row[j] : ""}
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
     </div>
