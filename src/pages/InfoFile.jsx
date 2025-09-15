@@ -1,42 +1,94 @@
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import RedButton from "../components/Button/PrimaryButton";
 
 const InfoFile = () => {
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [email, setEmail] = useState("");
-  const [phone, setPhone] = useState("");
+  const [executionDate, setExecutionDate] = useState("");
+  const [lineCount, setLineCount] = useState("");
+  const [fileId, setFileId] = useState(""); // auto-generated
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+
+  // Helper: format date to ddMMyyyy_hhmmss
+  const formatDateForId = useCallback((date) => {
+    const pad = (n) => n.toString().padStart(2, "0");
+
+    const day = pad(date.getDate());
+    const month = pad(date.getMonth() + 1);
+    const year = date.getFullYear();
+    const hours = pad(date.getHours());
+    const minutes = pad(date.getMinutes());
+    const seconds = pad(date.getSeconds());
+
+    return `${day}${month}${year}_${hours}${minutes}${seconds}`;
+  }, []);
+
+  // Regenerate File ID whenever executionDate changes
+  useEffect(() => {
+    if (executionDate) {
+      const date = new Date(executionDate);
+      setFileId(`Set3GProfile_${formatDateForId(date)}`);
+    } else {
+      setFileId("");
+    }
+  }, [executionDate, formatDateForId]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setMessage("Saving...");
 
+    const formatForOracle = (dateStr) => {
+      const d = new Date(dateStr);
+      const pad = (n) => n.toString().padStart(2, "0");
+      return `${pad(d.getDate())}/${pad(
+        d.getMonth() + 1
+      )}/${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(
+        d.getSeconds()
+      )}`;
+    };
+
     try {
-      const response = await fetch("http://localhost:5000/api/users/add-user", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ firstName, lastName, email, phone }),
-      });
+      const payload = {
+        executionDate: formatForOracle(executionDate),
+        lineCount: String(lineCount),
+        fileId: String(fileId),
+      };
 
-      const data = await response.json();
+      const response = await fetch(
+        "http://localhost:5000/api/users/add-batch",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        }
+      );
 
-      if (!response.ok) {
-        throw new Error(data.error || "Failed to insert data");
+      let data;
+      const contentType = response.headers.get("content-type");
+
+      if (contentType && contentType.includes("application/json")) {
+        data = await response.json();
+      } else {
+        data = await response.text(); // fallback for non-JSON responses
       }
 
-      setMessage("Data inserted successfully.");
-      setFirstName("");
-      setLastName("");
-      setEmail("");
-      setPhone("");
+      if (!response.ok) {
+        throw new Error(
+          typeof data === "string"
+            ? data
+            : data.error || "Failed to insert data"
+        );
+      }
 
-      // ✅ Pass phone to ImportBatch
-      navigate("/ImportBatch", { state: { phone } });
+      setMessage("Batch inserted successfully.");
+      setExecutionDate("");
+      setLineCount("");
+      setFileId("");
+
+      // ✅ Pass fileId to ImportBatch
+      navigate("/ImportBatch", { state: { fileId } });
     } catch (error) {
       setMessage(`Error inserting data: ${error.message}`);
     } finally {
@@ -53,60 +105,47 @@ const InfoFile = () => {
         <div className="col-12 col-sm-10 col-md-6 col-lg-4 mx-auto">
           <div className="p-4 border rounded shadow bg-light">
             <form onSubmit={handleSubmit}>
-              {/* Inputs */}
+              {/* Date et heure d’exécution */}
               <div className="mb-3">
-                <label htmlFor="firstName" className="form-label">
-                  First Name
+                <label htmlFor="executionDate" className="form-label">
+                  Date et heure d’exécution
                 </label>
                 <input
-                  id="firstName"
-                  type="text"
+                  id="executionDate"
+                  type="datetime-local"
                   className="form-control"
-                  value={firstName}
-                  onChange={(e) => setFirstName(e.target.value)}
+                  value={executionDate}
+                  onChange={(e) => setExecutionDate(e.target.value)}
                   required
                 />
               </div>
 
+              {/* Nombre de lignes */}
               <div className="mb-3">
-                <label htmlFor="lastName" className="form-label">
-                  Last Name
+                <label htmlFor="lineCount" className="form-label">
+                  Nombre de lignes
                 </label>
                 <input
-                  id="lastName"
-                  type="text"
+                  id="lineCount"
+                  type="number"
                   className="form-control"
-                  value={lastName}
-                  onChange={(e) => setLastName(e.target.value)}
+                  value={lineCount}
+                  onChange={(e) => setLineCount(e.target.value)}
                   required
                 />
               </div>
 
+              {/* Auto-generated File ID */}
               <div className="mb-3">
-                <label htmlFor="email" className="form-label">
-                  Email
+                <label htmlFor="fileId" className="form-label">
+                  File ID
                 </label>
                 <input
-                  id="email"
+                  id="fileId"
                   type="text"
                   className="form-control"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                />
-              </div>
-
-              <div className="mb-3">
-                <label htmlFor="phone" className="form-label">
-                  Phone
-                </label>
-                <input
-                  id="phone"
-                  type="text"
-                  className="form-control"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  required
+                  value={fileId}
+                  readOnly
                 />
               </div>
 

@@ -51,9 +51,7 @@ function NavBar({ isOpen, onClose }) {
               <li onClick={() => navigate("/set-contract-status")}>
                 Set Contract Status
               </li>
-              <li onClick={() => navigate("/update-rate-plan")}>
-                Update Rate Plan
-              </li>
+              <li onClick={() => navigate("/Search")}>hearch </li>
             </ul>
           )}
 

@@ -10,7 +10,7 @@ import ActivateServiceParametre from "./pages/Services/ActivateServiceParametre"
 import Home from "./pages/Home";
 import InfoFile from "./pages/InfoFile";
 import ImportBatch from "./components/ImportBatch";
-import Search from "./pages/Search";
+import Search from "./components/Search";
 
 function App() {
   return (
@@ -20,7 +20,7 @@ function App() {
 
         <Route element={<MainLayout />}>
           <Route path="/InfoFile" element={<InfoFile />} />
-          <Route path="/Search " element={<Search />} />
+          <Route path="/Search" element={<Search />} />
           <Route path="/ImportBatch" element={<ImportBatch />} />
           <Route path="/home" element={<Home />} />
           <Route path="/create-contract" element={<CreateContract />} />

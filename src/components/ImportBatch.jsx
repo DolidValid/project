@@ -161,17 +161,14 @@ const ImportBatch = () => {
 
   // ✅ Navigate to Activation Results page with fileId
   const goToResults = () => {
-    navigate("/activation-results", {
-      state: { fileId: phoneFromInfoFile },
-    });
+    navigate(`/search?query=${encodeURIComponent(phoneFromInfoFile)}`);
   };
 
   return (
     <div className="container mt-4">
       <h2 className="mb-4">Import Batch</h2>
       <p className="text-muted">
-        📱 Using File ID from phone:{" "}
-        <strong>{phoneFromInfoFile || "Not provided"}</strong>
+        📱 File ID : <strong>{phoneFromInfoFile || "Not provided"}</strong>
       </p>
 
       {/* ✅ Toolbar with Upload / Clear / View Results + Summary */}

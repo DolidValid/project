@@ -4,11 +4,13 @@ import { Table, Alert, Spinner, Form, Pagination } from "react-bootstrap";
 
 const Search = () => {
   const location = useLocation();
+
   const query = new URLSearchParams(location.search).get("query");
 
   const [result, setResult] = useState(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [noInput, setNoInput] = useState(false); // <-- new state
 
   // Pagination
   const [currentPage, setCurrentPage] = useState(1);
@@ -25,9 +27,13 @@ const Search = () => {
   useEffect(() => {
     const fetchData = async () => {
       if (!query) {
-        setError("No search input provided.");
+        setNoInput(true); // mark no input
+        setError("");
+        setResult(null);
         return;
       }
+
+      setNoInput(false);
 
       let body = {};
       if (msisdnRegex.test(query)) {
@@ -98,7 +104,7 @@ const Search = () => {
     if (totalPages <= 1) return null;
 
     return (
-      <Pagination className="mt-3">
+      <Pagination className="mt-3 justify-content-center">
         {[...Array(totalPages)].map((_, i) => (
           <Pagination.Item
             key={i}
@@ -180,18 +186,20 @@ const Search = () => {
   };
 
   return (
-    <div className="container-fluid">
-      <h3 className="mb-3">Search Results</h3>
+    <div className="container-fluid py-3">
+      <h3 className="mb-3 text-center">Search Results</h3>
 
       {loading && (
-        <div className="d-flex align-items-center">
+        <div className="d-flex justify-content-center align-items-center">
           <Spinner animation="border" className="me-2" /> Loading...
         </div>
       )}
 
-      {error && <Alert variant="danger">{error}</Alert>}
+      {noInput && <Alert variant="warning">No input provided.</Alert>}
 
-      {!loading && !error && renderTable()}
+      {error && !noInput && <Alert variant="danger">{error}</Alert>}
+
+      {!loading && !error && !noInput && renderTable()}
     </div>
   );
 };
