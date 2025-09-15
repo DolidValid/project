@@ -1,18 +1,12 @@
-// eslint-disable-next-line no-unused-vars
-import React, { useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  FaCogs,
-  FaUser,
-  FaSyncAlt,
-  FaPhone,
-  FaSignOutAlt,
-} from "react-icons/fa";
+import { FaCogs, FaUser, FaSyncAlt, FaPhone } from "react-icons/fa";
 import { FaFileContract, FaSimCard } from "react-icons/fa6";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./NavBarStyle.css";
+import PropTypes from "prop-types";
 
-function NavBar() {
+function NavBar({ isOpen, onClose }) {
   const [activeMenu, setActiveMenu] = useState("");
   const navigate = useNavigate();
 
@@ -20,42 +14,29 @@ function NavBar() {
     setActiveMenu((prev) => (prev === menuItem ? "" : menuItem));
   };
 
-  const handleLogout = () => {
-    navigate("/");
-  };
-
   return (
-    <>
-      {/* Toggle button for small screens */}
-      <button
-        className="btn btn-danger d-md-none m-2 menu-toggle-btn"
-        type="button"
-        data-bs-toggle="offcanvas"
-        data-bs-target="#sidebar"
-        aria-controls="sidebar"
-      >
-        <span className="menu-icon">☰</span>
-        <span className="menu-text">Menu</span>
-      </button>
+    <div
+      className={`sidebar bg-light p-3 d-flex flex-column shadow-sm ${
+        isOpen ? "show" : "d-none d-md-block"
+      }`}
+      style={{
+        width: isOpen ? "250px" : "0",
+        minHeight: "100vh",
+        transition: "width 0.3s ease",
+        overflowX: "hidden",
+        position: "fixed",
+        top: "56px", // below HeadBar
+        left: 0,
+        zIndex: 1040,
+      }}
+    >
+      {/* Close button on small screens */}
+      <div className="d-md-none d-flex justify-content-end">
+        <button className="btn-close" onClick={onClose}></button>
+      </div>
 
-      {/* Sidebar (offcanvas on mobile, static on desktop) */}
-      <div
-        className="offcanvas-md offcanvas-start d-flex flex-column bg-light p-3"
-        tabIndex="-1"
-        id="sidebar"
-        style={{ width: "250px" }}
-      >
-        <div className="offcanvas-header d-md-none">
-          <h5 className="offcanvas-title">Menu</h5>
-          <button
-            type="button"
-            className="btn-close"
-            data-bs-dismiss="offcanvas"
-            aria-label="Close"
-          ></button>
-        </div>
-
-        <ul className="menu list-unstyled flex-grow-1">
+      {isOpen && (
+        <ul className="menu list-unstyled flex-grow-1 mt-3">
           <li
             className={activeMenu === "Contracts" ? "active" : ""}
             onClick={() => handleMenuClick("Contracts")}
@@ -112,19 +93,13 @@ function NavBar() {
             <FaPhone className="icon" /> <span>Simulate first call</span>
           </li>
         </ul>
-
-        <div className="mt-auto">
-          <li
-            className="logout list-unstyled"
-            onClick={handleLogout}
-            style={{ cursor: "pointer" }}
-          >
-            <FaSignOutAlt className="icon" /> <span>Logout</span>
-          </li>
-        </div>
-      </div>
-    </>
+      )}
+    </div>
   );
 }
+NavBar.propTypes = {
+  isOpen: PropTypes.bool.isRequired,
+  onClose: PropTypes.func.isRequired,
+};
 
 export default NavBar;
