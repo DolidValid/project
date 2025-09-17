@@ -96,3 +96,10 @@
 .icon {
   font-size: 16px;
 }
+.sidebar .submenu li.active {
+  font-weight: bold;
+  color: #dc3545; /* red for highlight */
+  background-color: #f8d7da; /* light red background */
+  border-radius: 4px;
+  padding: 4px 8px;
+}

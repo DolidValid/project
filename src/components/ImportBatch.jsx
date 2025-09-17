@@ -7,7 +7,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 const ImportBatch = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const phoneFromInfoFile = location.state?.phone || "";
+  const phoneFromInfoFile = location.state?.fileId || "";
 
   const [file, setFile] = useState(null);
   const [previewData, setPreviewData] = useState([]);

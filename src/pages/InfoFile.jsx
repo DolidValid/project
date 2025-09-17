@@ -26,13 +26,14 @@ const InfoFile = () => {
 
   // Regenerate File ID whenever executionDate changes
   useEffect(() => {
-    if (executionDate) {
-      const date = new Date(executionDate);
-      setFileId(`Set3GProfile_${formatDateForId(date)}`);
-    } else {
-      setFileId("");
-    }
-  }, [executionDate, formatDateForId]);
+    // Get the current system date and time
+    const currentDate = new Date();
+
+    // Construct the fileId using the current date
+    setFileId(`Set3GProfile_${formatDateForId(currentDate)}`);
+
+    // The dependency array is now empty because we don't depend on external props
+  }, [formatDateForId]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();

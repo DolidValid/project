@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { FaCogs, FaUser, FaSyncAlt, FaPhone } from "react-icons/fa";
+import { FaCogs, FaUser, FaSyncAlt, FaPhone, FaSignal } from "react-icons/fa";
 import { FaFileContract, FaSimCard } from "react-icons/fa6";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./NavBarStyle.css";
@@ -8,10 +8,17 @@ import PropTypes from "prop-types";
 
 function NavBar({ isOpen, onClose }) {
   const [activeMenu, setActiveMenu] = useState("");
+  const [activeSubmenu, setActiveSubmenu] = useState(""); // ✅ new state
   const navigate = useNavigate();
 
   const handleMenuClick = (menuItem) => {
     setActiveMenu((prev) => (prev === menuItem ? "" : menuItem));
+    setActiveSubmenu(""); // reset submenu when switching main menu
+  };
+
+  const handleSubmenuClick = (submenu, path) => {
+    setActiveSubmenu(submenu); // ✅ set submenu active
+    navigate(path);
   };
 
   return (
@@ -37,23 +44,9 @@ function NavBar({ isOpen, onClose }) {
 
       {isOpen && (
         <ul className="menu list-unstyled flex-grow-1 mt-3">
-          <li
-            className={activeMenu === "Contracts" ? "active" : ""}
-            onClick={() => handleMenuClick("Contracts")}
-          >
+          <li>
             <FaFileContract className="icon" /> <span>Contracts</span>
           </li>
-          {activeMenu === "Contracts" && (
-            <ul className="submenu list-unstyled ms-3">
-              <li onClick={() => navigate("/create-contract")}>
-                Create Contract
-              </li>
-              <li onClick={() => navigate("/set-contract-status")}>
-                Set Contract Status
-              </li>
-              <li onClick={() => navigate("/Search")}>hearch </li>
-            </ul>
-          )}
 
           <li
             className={activeMenu === "Services" ? "active" : ""}
@@ -63,23 +56,20 @@ function NavBar({ isOpen, onClose }) {
           </li>
           {activeMenu === "Services" && (
             <ul className="submenu list-unstyled ms-3">
-              <li>Set Service Status</li>
-              <li>Activate Service Parameter</li>
+              <li
+                className={activeSubmenu === "Activation" ? "active" : ""} // ✅ highlight
+                onClick={() =>
+                  handleSubmenuClick("Activation", "/create-contract")
+                }
+              >
+                <FaSignal className="me-2 text-danger" /> Activation 4G
+              </li>
             </ul>
           )}
 
-          <li
-            className={activeMenu === "Customer" ? "active" : ""}
-            onClick={() => handleMenuClick("Customer")}
-          >
+          <li>
             <FaUser className="icon" /> <span>Customer</span>
           </li>
-          {activeMenu === "Customer" && (
-            <ul className="submenu list-unstyled ms-3">
-              <li>Blacklist Customers</li>
-              <li>Update Customers</li>
-            </ul>
-          )}
 
           <li>
             <FaSimCard className="icon" /> <span>Release resource</span>
@@ -95,6 +85,7 @@ function NavBar({ isOpen, onClose }) {
     </div>
   );
 }
+
 NavBar.propTypes = {
   isOpen: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,
