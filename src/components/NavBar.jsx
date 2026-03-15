@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaCogs, FaUser, FaSyncAlt, FaPhone, FaSignal } from "react-icons/fa";
-import { FaFileContract, FaSimCard } from "react-icons/fa6";
+import { Fa0, FaFileContract, FaSimCard } from "react-icons/fa6";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./NavBarStyle.css";
 import PropTypes from "prop-types";
@@ -44,9 +44,38 @@ function NavBar({ isOpen, onClose }) {
 
       {isOpen && (
         <ul className="menu list-unstyled flex-grow-1 mt-3">
-          <li>
+          <li
+            className={activeMenu === "Contracts" ? "active" : ""}
+            onClick={() => handleMenuClick("Contracts")}
+          >
             <FaFileContract className="icon" /> <span>Contracts</span>
           </li>
+
+          {activeMenu === "Contracts" && (
+            <ul className="submenu list-unstyled ms-3">
+              <li
+                className={
+                  activeSubmenu === "SetContractStatus" ? "active" : ""
+                } // ✅ highlight
+                onClick={() =>
+                  handleSubmenuClick(
+                    "SetContractStatus",
+                    "/set-contract-status",
+                  )
+                }
+              >
+                <span className="me-2 text-danger">SetContractStatus</span>
+              </li>
+              <li
+                className={activeSubmenu === "CreateContract" ? "active" : ""}
+                onClick={() =>
+                  handleSubmenuClick("CreateContract", "/create-contract")
+                }
+              >
+                <span className="me-2 text-danger">CreateContract</span>
+              </li>
+            </ul>
+          )}
 
           <li
             className={activeMenu === "Services" ? "active" : ""}

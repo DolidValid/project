@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import RedButton from "../components/Button/PrimaryButton";
 
-const InfoFile = () => {
+const InfoFile = ({ onSuccess }) => {
   const [executionDate, setExecutionDate] = useState("");
   const [lineCount, setLineCount] = useState("");
   const [fileId, setFileId] = useState(""); // auto-generated
@@ -44,9 +44,9 @@ const InfoFile = () => {
       const d = new Date(dateStr);
       const pad = (n) => n.toString().padStart(2, "0");
       return `${pad(d.getDate())}/${pad(
-        d.getMonth() + 1
+        d.getMonth() + 1,
       )}/${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(
-        d.getSeconds()
+        d.getSeconds(),
       )}`;
     };
 
@@ -63,7 +63,7 @@ const InfoFile = () => {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload),
-        }
+        },
       );
 
       let data;
@@ -79,7 +79,7 @@ const InfoFile = () => {
         throw new Error(
           typeof data === "string"
             ? data
-            : data.error || "Failed to insert data"
+            : data.error || "Failed to insert data",
         );
       }
 
@@ -88,8 +88,12 @@ const InfoFile = () => {
       setLineCount("");
       setFileId("");
 
-      // ✅ Pass fileId to ImportBatch
-      navigate("/ImportBatch", { state: { fileId } });
+      // ✅ Pass fileId to ImportBatch via prop or navigation
+      if (onSuccess) {
+        onSuccess(fileId);
+      } else {
+        navigate("/ImportBatch", { state: { fileId } });
+      }
     } catch (error) {
       setMessage(`Error inserting data: ${error.message}`);
     } finally {

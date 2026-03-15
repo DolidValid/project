@@ -3,11 +3,12 @@ import { useLocation, useNavigate } from "react-router-dom";
 import * as XLSX from "xlsx";
 import { LuFileUp } from "react-icons/lu";
 import "bootstrap/dist/css/bootstrap.min.css";
+import { EXPECTED_HEADERS, fieldMapping } from "../config/importConfig";
 
-const ImportBatch = () => {
+const ImportBatch = ({ type, apiUrl, fileId }) => {
   const location = useLocation();
   const navigate = useNavigate();
-  const phoneFromInfoFile = location.state?.fileId || "";
+  const phoneFromInfoFile = fileId || location.state?.fileId || "";
 
   const [file, setFile] = useState(null);
   const [previewData, setPreviewData] = useState([]);
@@ -15,22 +16,6 @@ const ImportBatch = () => {
   const [error, setError] = useState("");
   const [isDragActive, setIsDragActive] = useState(false);
   const [uploading, setUploading] = useState(false);
-
-  // ✅ Define mapping Excel header -> backend field
-  const fieldMapping = {
-    ID: "id",
-    MSISDN: "msisdn",
-    ACTION: "action",
-    SIGN_CONTRACT_3G_DATE: "signContractDate",
-    TEMPLATE_NAME: "templateName",
-    USER_LOGIN: "userLogin",
-    FILE_ID: "fileId",
-    NOTIFICATION_MSISDN: "notificationMsisdn",
-    NOTIFICATION_TEMPLATE: "notificationTemplate",
-    JOB_ID: "jobId",
-    PROMO: "promo",
-    CO_ID: "coId",
-  };
 
   // ✅ Reset state
   const handleClear = () => {
@@ -53,7 +38,7 @@ const ImportBatch = () => {
 
     if (!validTypes.includes(selectedFile.type)) {
       setError(
-        "Invalid file type. Please upload an Excel file (.xlsx or .xls)."
+        "Invalid file type. Please upload an Excel file (.xlsx or .xls).",
       );
       return;
     }
@@ -79,6 +64,33 @@ const ImportBatch = () => {
         const worksheet = workbook.Sheets[sheetName];
         const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
 
+        const uploadedHeaders = jsonData[0] || [];
+        let requiredHeaders = [];
+
+        switch (type) {
+          case "CREATE_CONTRACT":
+            requiredHeaders = EXPECTED_HEADERS.CREATE_CONTRACT;
+            break;
+          case "SET_STATUS":
+            requiredHeaders = EXPECTED_HEADERS.SET_STATUS;
+            break;
+          default:
+            requiredHeaders = [];
+            break;
+        }
+
+        if (requiredHeaders.length > 0) {
+          const missingColumns = requiredHeaders.filter(
+            (header) => !uploadedHeaders.includes(header),
+          );
+
+          if (missingColumns.length > 0) {
+            setError(`Missing columns: ${missingColumns.join(", ")}`);
+            setPreviewData([]);
+            return;
+          }
+        }
+
         setPreviewData(jsonData);
         setRowStatuses([]);
       } catch {
@@ -103,7 +115,7 @@ const ImportBatch = () => {
 
     if (!phoneFromInfoFile) {
       setError(
-        "File ID is missing. Please go back and provide a valid file ID."
+        "File ID is missing. Please go back and provide a valid file ID.",
       );
       return;
     }
@@ -116,6 +128,7 @@ const ImportBatch = () => {
     const rows = previewData.slice(1);
 
     const statuses = [];
+    const parsedPayloads = [];
 
     for (let i = 0; i < rows.length; i++) {
       const row = rows[i];
@@ -128,9 +141,10 @@ const ImportBatch = () => {
       });
 
       payload.fileId = phoneFromInfoFile;
+      parsedPayloads.push(payload);
 
       try {
-        const res = await fetch("http://localhost:5000/api/users/active4G", {
+        const res = await fetch(apiUrl, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload),
