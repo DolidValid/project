@@ -5,9 +5,11 @@ import ImportBatch from "../../components/ImportBatch";
 const Activation3G = () => {
   const [step, setStep] = useState(0);
   const [fileId, setFileId] = useState("");
+  const [executionDate, setExecutionDate] = useState("");
 
-  const handleInfoSuccess = (generatedId) => {
+  const handleInfoSuccess = (generatedId, exeDate) => {
     setFileId(generatedId);
+    setExecutionDate(exeDate);
     setStep(2);
   };
 
@@ -25,7 +27,7 @@ const Activation3G = () => {
         )}
         {step === 1 && <InfoFile onSuccess={handleInfoSuccess} prefix="Set3GProfile__" />}
         {step === 2 && (
-          <ImportBatch type="ACTIVATION_3G" fileId={fileId} />
+          <ImportBatch type="ACTIVATION_3G" fileId={fileId} executionDate={executionDate} />
         )}
       </div>
     </div>

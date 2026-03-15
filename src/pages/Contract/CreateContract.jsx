@@ -5,9 +5,11 @@ import ImportBatch from "../../components/ImportBatch";
 const CreateContract = () => {
   const [step, setStep] = useState(0);
   const [fileId, setFileId] = useState("");
+  const [executionDate, setExecutionDate] = useState("");
 
-  const handleInfoSuccess = (generatedId) => {
+  const handleInfoSuccess = (generatedId, exeDate) => {
     setFileId(generatedId);
+    setExecutionDate(exeDate);
     setStep(2);
   };
 
@@ -29,6 +31,7 @@ const CreateContract = () => {
             type="CREATE_CONTRACT"
             apiUrl="http://localhost:5000/api/users/active4G"
             fileId={fileId}
+            executionDate={executionDate}
           />
         )}
       </div>

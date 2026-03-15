@@ -38,64 +38,24 @@ const InfoFile = ({ onSuccess, prefix = "Set3GProfile_" }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setMessage("Saving...");
 
     const formatForOracle = (dateStr) => {
       const d = new Date(dateStr);
       const pad = (n) => n.toString().padStart(2, "0");
-      return `${pad(d.getDate())}/${pad(
-        d.getMonth() + 1,
-      )}/${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(
-        d.getSeconds(),
-      )}`;
+      return `${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
     };
 
     try {
-      const payload = {
-        executionDate: formatForOracle(executionDate),
-        lineCount: String(lineCount),
-        fileId: String(fileId),
-      };
+      const formattedDate = formatForOracle(executionDate);
 
-      const response = await fetch(
-        "http://localhost:5000/api/users/add-batch",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-        },
-      );
-
-      let data;
-      const contentType = response.headers.get("content-type");
-
-      if (contentType && contentType.includes("application/json")) {
-        data = await response.json();
-      } else {
-        data = await response.text(); // fallback for non-JSON responses
-      }
-
-      if (!response.ok) {
-        throw new Error(
-          typeof data === "string"
-            ? data
-            : data.error || "Failed to insert data",
-        );
-      }
-
-      setMessage("Batch inserted successfully.");
-      setExecutionDate("");
-      setLineCount("");
-      setFileId("");
-
-      // ✅ Pass fileId to ImportBatch via prop or navigation
+      // ✅ Pass fileId and executionDate to ImportBatch via prop or navigation
       if (onSuccess) {
-        onSuccess(fileId);
+        onSuccess(fileId, formattedDate);
       } else {
-        navigate("/ImportBatch", { state: { fileId } });
+        navigate("/ImportBatch", { state: { fileId, executionDate: formattedDate } });
       }
     } catch (error) {
-      setMessage(`Error inserting data: ${error.message}`);
+      setMessage(`Error: ${error.message}`);
     } finally {
       setLoading(false);
     }

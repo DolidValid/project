@@ -6,9 +6,11 @@ import ImportBatch from "../../components/ImportBatch";
 const SetContractStatus = () => {
   const [step, setStep] = useState(0);
   const [fileId, setFileId] = useState("");
+  const [executionDate, setExecutionDate] = useState("");
 
-  const handleInfoSuccess = (generatedId) => {
+  const handleInfoSuccess = (generatedId, exeDate) => {
     setFileId(generatedId);
+    setExecutionDate(exeDate);
     setStep(2);
   };
 
@@ -38,6 +40,7 @@ const SetContractStatus = () => {
             type="SET_STATUS"
             apiUrl="http://localhost:5000/api/contracts/status"
             fileId={fileId}
+            executionDate={executionDate}
           />
         )}
       </div>
