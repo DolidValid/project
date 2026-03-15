@@ -5,7 +5,7 @@ const UpdateRatePlan = () => {
     <div style={{ display: "flex", height: "100vh" }}>
       {/* ImportBatch on the right */}
       <div style={{ flex: 1, padding: "20px" }}>
-        <ImportBatch />
+        <ImportBatch type="UPDATE_RATE_PLAN" />
       </div>
     </div>
   );

@@ -17,14 +17,22 @@ const SetContractStatus = () => {
       {/* Step Wizard Container */}
       <div style={{ flex: 1, padding: "20px" }}>
         {step === 0 && (
-          <div className="d-flex flex-column justify-content-center align-items-center" style={{ height: "80%" }}>
+          <div
+            className="d-flex flex-column justify-content-center align-items-center"
+            style={{ height: "80%" }}
+          >
             <h2 className="mb-4">Set Contract Status</h2>
-            <button className="btn btn-primary btn-lg" onClick={() => setStep(1)}>
+            <button
+              className="btn btn-primary btn-lg"
+              onClick={() => setStep(1)}
+            >
               Start New Batch
             </button>
           </div>
         )}
-        {step === 1 && <InfoFile onSuccess={handleInfoSuccess} />}
+        {step === 1 && (
+          <InfoFile onSuccess={handleInfoSuccess} prefix="SetContrcatStatus_" />
+        )}
         {step === 2 && (
           <ImportBatch
             type="SET_STATUS"

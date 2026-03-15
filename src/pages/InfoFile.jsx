@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import RedButton from "../components/Button/PrimaryButton";
 
-const InfoFile = ({ onSuccess }) => {
+const InfoFile = ({ onSuccess, prefix = "Set3GProfile_" }) => {
   const [executionDate, setExecutionDate] = useState("");
   const [lineCount, setLineCount] = useState("");
   const [fileId, setFileId] = useState(""); // auto-generated
@@ -30,10 +30,10 @@ const InfoFile = ({ onSuccess }) => {
     const currentDate = new Date();
 
     // Construct the fileId using the current date
-    setFileId(`Set3GProfile_${formatDateForId(currentDate)}`);
+    setFileId(`${prefix}${formatDateForId(currentDate)}`);
 
     // The dependency array is now empty because we don't depend on external props
-  }, [formatDateForId]);
+  }, [formatDateForId, prefix]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();

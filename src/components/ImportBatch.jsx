@@ -105,7 +105,7 @@ const ImportBatch = ({ type, apiUrl, fileId }) => {
     handleFile(selectedFile);
   };
 
-  // ✅ Handle upload with header mapping (keep empty values)
+  // ✅ Handle upload with header mapping (keep empty values) - BULK UPLOAD VERSION
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!file || previewData.length < 2) {
@@ -114,9 +114,12 @@ const ImportBatch = ({ type, apiUrl, fileId }) => {
     }
 
     if (!phoneFromInfoFile) {
-      setError(
-        "File ID is missing. Please go back and provide a valid file ID.",
-      );
+      setError("File ID is missing. Please go back and provide a valid file ID.");
+      return;
+    }
+
+    if (!type) {
+      setError("Batch type is missing. Contact the administrator to fix the screen configuration.");
       return;
     }
 
@@ -126,10 +129,9 @@ const ImportBatch = ({ type, apiUrl, fileId }) => {
 
     const headers = previewData[0];
     const rows = previewData.slice(1);
-
-    const statuses = [];
     const parsedPayloads = [];
 
+    // Parse all rows locally into one massive array
     for (let i = 0; i < rows.length; i++) {
       const row = rows[i];
       if (!row || row.length === 0) continue;
@@ -142,30 +144,35 @@ const ImportBatch = ({ type, apiUrl, fileId }) => {
 
       payload.fileId = phoneFromInfoFile;
       parsedPayloads.push(payload);
-
-      try {
-        const res = await fetch(apiUrl, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-        });
-
-        if (res.ok) {
-          statuses.push({ row: i + 1, status: "success" });
-        } else {
-          const errData = await res.json();
-          statuses.push({
-            row: i + 1,
-            status: "error",
-            message: errData.error || errData.message || "Insert failed",
-          });
-        }
-      } catch {
-        statuses.push({ row: i + 1, status: "error", message: "API error" });
-      }
     }
 
-    setRowStatuses(statuses);
+    // Wrap in Master Payload required by new Backend Unified Route
+    const masterPayload = {
+      executionDate: new Date().toISOString(), // Fallback if info file date not locally accessible, though info file already logged it. Better: use the one set in infoFile but simplified here
+      fileId: phoneFromInfoFile,
+      operationType: type,
+      data: parsedPayloads
+    };
+
+    try {
+      const res = await fetch("http://localhost:5000/api/users/upload-batch", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(masterPayload),
+      });
+
+      if (res.ok) {
+        // Success: Mark all rows as success visually
+        const successStatuses = parsedPayloads.map((_, i) => ({ row: i + 1, status: "success" }));
+        setRowStatuses(successStatuses);
+      } else {
+        const errData = await res.json();
+        setError(`Upload Failed: ${errData.error || errData.message || "Unknown error"}`);
+      }
+    } catch (err) {
+      setError(`Network Error: ${err.message}`);
+    }
+
     setUploading(false);
   };
 

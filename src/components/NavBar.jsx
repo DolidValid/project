@@ -86,7 +86,7 @@ function NavBar({ isOpen, onClose }) {
           {activeMenu === "Services" && (
             <ul className="submenu list-unstyled ms-3">
               <li
-                className={activeSubmenu === "Activation" ? "active" : ""} // ✅ highlight
+                className={activeSubmenu === "Activation 4g" ? "active" : ""} // ✅ highlight
                 onClick={() =>
                   handleSubmenuClick("Activation", "/create-contract")
                 }

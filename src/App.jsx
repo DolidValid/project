@@ -5,12 +5,12 @@ import LoginPage from "./pages/LoginPage";
 import CreateContract from "./pages/Contract/CreateContract";
 import SetContractStatus from "./pages/Contract/SetContractStatus";
 import UpdateRatePlan from "./pages/Contract/UpdateRatePlan";
-import SetServiceStatus from "./pages/Services/SetServicStatus";
 import ActivateServiceParametre from "./pages/Services/ActivateServiceParametre";
 import Home from "./pages/Home";
 import InfoFile from "./pages/InfoFile";
 import ImportBatch from "./components/ImportBatch";
 import Search from "./components/Search";
+import Activation3G from "./pages/Services/Activation3g";
 
 function App() {
   return (
@@ -27,7 +27,7 @@ function App() {
           <Route path="/set-contract-status" element={<SetContractStatus />} />
           <Route path="/update-rate-plan" element={<UpdateRatePlan />} />
 
-          <Route path="/update-rate-plan" element={<SetServiceStatus />} />
+          <Route path="/activation3G" element={<Activation3G />} />
           <Route
             path="/update-rate-plan"
             element={<ActivateServiceParametre />}
