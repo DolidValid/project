@@ -29,7 +29,6 @@ const CreateContract = () => {
         {step === 2 && (
           <ImportBatch
             type="CREATE_CONTRACT"
-            apiUrl="http://localhost:5000/api/users/active4G"
             fileId={fileId}
             executionDate={executionDate}
           />

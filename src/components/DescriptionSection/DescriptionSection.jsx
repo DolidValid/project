@@ -1,4 +1,3 @@
-import React from "react";
 import oo from "../../assets/img/oo.png";
 
 export const DescriptionSection = () => {

@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
+import PropTypes from "prop-types";
 import RedButton from "../components/Button/PrimaryButton";
 
 const InfoFile = ({ onSuccess, prefix = "Set3GProfile_" }) => {
@@ -129,6 +130,11 @@ const InfoFile = ({ onSuccess, prefix = "Set3GProfile_" }) => {
       </div>
     </div>
   );
+};
+
+InfoFile.propTypes = {
+  onSuccess: PropTypes.func,
+  prefix: PropTypes.string,
 };
 
 export default InfoFile;

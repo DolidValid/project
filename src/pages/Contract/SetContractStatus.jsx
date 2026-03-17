@@ -32,12 +32,11 @@ const SetContractStatus = () => {
           </div>
         )}
         {step === 1 && (
-          <InfoFile onSuccess={handleInfoSuccess} prefix="SetContrcatStatus_" />
+          <InfoFile onSuccess={handleInfoSuccess} prefix="SetContractStatus_" />
         )}
         {step === 2 && (
           <ImportBatch
             type="SET_STATUS"
-            apiUrl="http://localhost:5000/api/contracts/status"
             fileId={fileId}
             executionDate={executionDate}
           />

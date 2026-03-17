@@ -22,7 +22,10 @@ const Search = () => {
   // Regex patterns
   const msisdnRegex = useMemo(() => /^213\d{9,12}$/, []);
   const infoFileIdRegex = useMemo(() => /^\d+-[A-Za-z0-9]+$/, []);
-  const fileIdRegex = useMemo(() => /^Set3GProfile_\d+_\d+$/, []);
+  const fileIdRegex = useMemo(
+    () => /^(Set3GProfile|SetContractAndServices|SetContractStatus)_\d+_\d+$/,
+    []
+  );
 
   useEffect(() => {
     const fetchData = async () => {

@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import * as XLSX from "xlsx";
 import { LuFileUp } from "react-icons/lu";
+import PropTypes from "prop-types";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { EXPECTED_HEADERS, fieldMapping } from "../config/importConfig";
 
@@ -315,6 +316,12 @@ const ImportBatch = ({ type, fileId, executionDate }) => {
       )}
     </div>
   );
+};
+
+ImportBatch.propTypes = {
+  type: PropTypes.string,
+  fileId: PropTypes.string,
+  executionDate: PropTypes.string,
 };
 
 export default ImportBatch;
