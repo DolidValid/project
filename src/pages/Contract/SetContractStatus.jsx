@@ -1,5 +1,4 @@
-// eslint-disable-next-line no-unused-vars
-import React, { useState } from "react";
+import { useState } from "react";
 import InfoFile from "../InfoFile";
 import ImportBatch from "../../components/ImportBatch";
 

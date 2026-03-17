@@ -1,5 +1,4 @@
-// eslint-disable-next-line no-unused-vars
-import React, { useState } from "react";
+import { useState } from "react";
 import { Navbar, Form, FormControl, Dropdown } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { FaUserCircle } from "react-icons/fa";

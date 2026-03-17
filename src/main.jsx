@@ -8,7 +8,7 @@ import "primereact/resources/themes/lara-light-blue/theme.css"; // You can choos
 import "primereact/resources/primereact.min.css";
 import "primeicons/primeicons.css";
 import "./index.css";
-//import { BrowserRouter } from "react-router-dom";
+
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import InfoFile from "../InfoFile";
 import ImportBatch from "../../components/ImportBatch";
 
@@ -25,7 +25,7 @@ const Activation3G = () => {
             </button>
           </div>
         )}
-        {step === 1 && <InfoFile onSuccess={handleInfoSuccess} prefix="Set3GProfile__" />}
+        {step === 1 && <InfoFile onSuccess={handleInfoSuccess} prefix="Set3GProfile_" />}
         {step === 2 && (
           <ImportBatch type="ACTIVATION_3G" fileId={fileId} executionDate={executionDate} />
         )}

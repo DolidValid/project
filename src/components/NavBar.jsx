@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaCogs, FaUser, FaSyncAlt, FaPhone, FaSignal } from "react-icons/fa";
-import { Fa0, FaFileContract, FaSimCard } from "react-icons/fa6";
+import { FaFileContract, FaSimCard } from "react-icons/fa6";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./NavBarStyle.css";
 import PropTypes from "prop-types";
@@ -88,7 +88,7 @@ function NavBar({ isOpen, onClose }) {
               <li
                 className={activeSubmenu === "Activation 4g" ? "active" : ""} // ✅ highlight
                 onClick={() =>
-                  handleSubmenuClick("Activation", "/create-contract")
+                  handleSubmenuClick("Activation 4g", "/activation3G")
                 }
               >
                 <FaSignal className="me-2 text-danger" /> Activation 4G

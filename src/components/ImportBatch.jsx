@@ -5,7 +5,7 @@ import { LuFileUp } from "react-icons/lu";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { EXPECTED_HEADERS, fieldMapping } from "../config/importConfig";
 
-const ImportBatch = ({ type, apiUrl, fileId, executionDate }) => {
+const ImportBatch = ({ type, fileId, executionDate }) => {
   const location = useLocation();
   const navigate = useNavigate();
   
