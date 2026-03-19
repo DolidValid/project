@@ -29,7 +29,7 @@ function App() {
 
           <Route path="/activation3G" element={<Activation3G />} />
           <Route
-            path="/update-rate-plan"
+            path="/activate-service-param"
             element={<ActivateServiceParametre />}
           />
         </Route>
