@@ -2,16 +2,16 @@ import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import * as XLSX from "xlsx";
 import { 
-  LuFileUp, 
-  LuCheckCircle, 
-  LuXCircle, 
-  LuAlertTriangle, 
-  LuArrowRight, 
-  LuRocket, 
-  LuSearch, 
-  LuTrash2 
-} from "react-icons/lu";
-import { Modal, Table, Spinner, Badge } from "react-bootstrap";
+  Upload as LuFileUp, 
+  CheckCircle as LuCheckCircle, 
+  XCircle as LuXCircle, 
+  ExclamationTriangle as LuAlertTriangle, 
+  ArrowRight as LuArrowRight, 
+  BoxSeam as LuRocket, 
+  Search as LuSearch, 
+  Trash as LuTrash2 
+} from "react-bootstrap-icons";
+import { Table, Spinner, Badge } from "react-bootstrap";
 import { EXPECTED_HEADERS, fieldMapping } from "../config/importConfig";
 import "./ImportBatchStyle.css";
 
@@ -35,16 +35,11 @@ const ImportBatch = ({ type, fileId, executionDate }) => {
   const [isDragActive, setIsDragActive] = useState(false);
   const [uploading, setUploading] = useState(false);
 
-  const [isFetchingResults, setIsFetchingResults] = useState(false);
-  const [resultsData, setResultsData] = useState(null);
-  const [showResultsModal, setShowResultsModal] = useState(false);
-
   const handleClear = () => {
     setFile(null);
     setPreviewData([]);
     setRowStatuses([]);
     setError("");
-    setResultsData(null);
   };
 
   const handleFile = (selectedFile) => {
@@ -181,32 +176,9 @@ const ImportBatch = ({ type, fileId, executionDate }) => {
     setUploading(false);
   };
 
-  const viewResults = async () => {
+  const viewResults = () => {
     if (!phoneFromInfoFile) return;
-
-    setIsFetchingResults(true);
-    setError("");
-
-    try {
-      const res = await fetch("http://localhost:5000/api/users/resultBatch", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ fileId: phoneFromInfoFile }),
-      });
-
-      if (res.ok) {
-        const data = await res.json();
-        setResultsData(data);
-        setShowResultsModal(true);
-      } else {
-        const errData = await res.json();
-        setError(`Fetch Failed: ${errData.error || "Could not retrieve results"}`);
-      }
-    } catch (err) {
-      setError(`Network Error: ${err.message}`);
-    } finally {
-      setIsFetchingResults(false);
-    }
+    navigate(`/batch-results/${encodeURIComponent(phoneFromInfoFile)}`);
   };
 
   const successCount = rowStatuses.filter((r) => r.status === "success").length;
@@ -306,15 +278,8 @@ const ImportBatch = ({ type, fileId, executionDate }) => {
               <button
                 className="btn btn-ooredoo-success d-flex align-items-center gap-2"
                 onClick={viewResults}
-                disabled={isFetchingResults}
               >
-                {isFetchingResults ? (
-                  <Spinner animation="border" size="sm" />
-                ) : (
-                  <>
-                    View Activation Results <LuArrowRight size={18} />
-                  </>
-                )}
+                  View Activation Results <LuArrowRight size={18} />
               </button>
             )}
           </div>
@@ -369,81 +334,6 @@ const ImportBatch = ({ type, fileId, executionDate }) => {
           </div>
         )}
       </div>
-
-      {/* Activation Results Modal */}
-      <Modal show={showResultsModal} onHide={() => setShowResultsModal(false)} size="xl" centered>
-        <Modal.Header closeButton style={{ background: 'var(--header-gradient)', color: 'white' }}>
-          <Modal.Title className="fw-bold">Activation Results (Oracle ESB_LOG)</Modal.Title>
-        </Modal.Header>
-        <Modal.Body className="p-0">
-          <div className="p-4 bg-light border-bottom">
-            <div className="row g-3">
-              <div className="col-md-3">
-                <label className="text-muted small">File ID</label>
-                <div className="fw-bold">{resultsData?.batchInfo?.fileId}</div>
-              </div>
-              <div className="col-md-3">
-                <label className="text-muted small">Operation</label>
-                <div className="fw-bold"><Badge bg="danger">{resultsData?.batchInfo?.operationType}</Badge></div>
-              </div>
-              <div className="col-md-3">
-                <label className="text-muted small">Batch Status</label>
-                <div className="fw-bold"><Badge bg="dark">{resultsData?.batchInfo?.etat}</Badge></div>
-              </div>
-              <div className="col-md-3">
-                <label className="text-muted small">Result Count</label>
-                <div className="fw-bold text-success">{resultsData?.oracleResultsCount} recorded</div>
-              </div>
-            </div>
-          </div>
-          
-          <div className="table-responsive" style={{ maxHeight: '60vh' }}>
-            <Table striped borderless hover className="mb-0 align-middle">
-              <thead>
-                <tr>
-                  <th className="ps-4">MSISDN</th>
-                  <th>Transaction ID</th>
-                  <th>Status</th>
-                  <th>Message</th>
-                  <th>Step</th>
-                  <th>Date</th>
-                </tr>
-              </thead>
-              <tbody>
-                {resultsData?.transactionResults?.length > 0 ? (
-                  resultsData.transactionResults.map((r, i) => (
-                    <tr key={i}>
-                      <td className="ps-4 fw-bold">{r.msisdn}</td>
-                      <td className="small text-muted">{r.TRANSACTION_ID || r.transactionId}</td>
-                      <td>
-                        <Badge 
-                          bg={r.STATUS === 'SUCCESS' || r.STATUS === 'FINISHED' ? 'success' : r.STATUS === 'PENDING' ? 'warning' : 'danger'}
-                        >
-                          {r.STATUS || 'UNKNOWN'}
-                        </Badge>
-                      </td>
-                      <td className="small">{r.PROCESS_ADDITION_MSG || r.MAIN_INFO || '-'}</td>
-                      <td><Badge bg="light" text="dark">{r.TRACE_IN_STEP || '-'}</Badge></td>
-                      <td className="small text-muted">{r.STATUS_DATE || r.CREATION_DATE || '-'}</td>
-                    </tr>
-                  ))
-                ) : (
-                  <tr>
-                    <td colSpan="6" className="text-center py-5">
-                      <LuSearch size={32} className="text-muted mb-3 d-block mx-auto" />
-                      <h5 className="text-muted">No results found in ESB_LOG.</h5>
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </Table>
-          </div>
-        </Modal.Body>
-        <Modal.Footer>
-          <button className="btn btn-secondary px-4" onClick={() => setShowResultsModal(false)}>Close</button>
-          <button className="btn btn-ooredoo px-4" onClick={() => window.print()}>Export Results</button>
-        </Modal.Footer>
-      </Modal>
     </div>
   );
 };

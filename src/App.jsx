@@ -11,6 +11,8 @@ import InfoFile from "./pages/InfoFile";
 import ImportBatch from "./components/ImportBatch";
 import Search from "./components/Search";
 import Activation3G from "./pages/Services/Activation3g";
+import ResultBatchPage from "./pages/ResultBatchPage";
+import BatchHistory from "./pages/BatchHistory";
 
 function App() {
   return (
@@ -32,6 +34,8 @@ function App() {
             path="/activate-service-param"
             element={<ActivateServiceParametre />}
           />
+          <Route path="/batch-results/:fileId" element={<ResultBatchPage />} />
+          <Route path="/batch-history" element={<BatchHistory />} />
         </Route>
       </Routes>
     </Router>

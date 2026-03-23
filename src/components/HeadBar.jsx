@@ -19,32 +19,49 @@ const HeadBar = ({ onToggleSidebar, onLogout }) => {
 
   return (
     <Navbar
-      bg="light"
       expand="md"
       fixed="top"
-      className="px-3 shadow-sm justify-content-between"
+      className="px-4 py-2 shadow-sm justify-content-between"
+      style={{
+        background: 'linear-gradient(90deg, #ed1c24 0%, #b31217 100%)',
+        color: '#ffffff'
+      }}
     >
       {/* Left side: Batch App + toggle */}
       <div className="d-flex align-items-center">
-        <span className="fw-bold text-dark me-3">Batch App</span>
         <button
-          className="btn btn-outline-dark btn-sm"
+          className="btn btn-link text-white p-0 me-3"
           onClick={onToggleSidebar}
+          style={{ textDecoration: 'none', fontSize: '1.5rem' }}
         >
           ☰
         </button>
+        <div className="d-flex align-items-center pe-auto" style={{ cursor: "pointer" }} onClick={() => navigate('/home')}>
+           <div className="bg-white rounded-circle d-flex justify-content-center align-items-center me-2" style={{ width: '36px', height: '36px' }}>
+             <span className="fw-bold fs-5 text-danger">O</span>
+           </div>
+           <span className="fw-bold text-white fs-5 tracking-wide" style={{ letterSpacing: '1px' }}>BATCH MANAGER</span>
+        </div>
       </div>
 
       {/* Center: Search bar (hidden on small screens) */}
       <Form className="flex-grow-1 d-none d-md-flex justify-content-center">
-        <FormControl
-          type="search"
-          placeholder="Search..."
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          onKeyDown={handleKeyPress}
-          className="w-50 text-center"
-        />
+        <div className="input-group shadow-sm" style={{ maxWidth: '500px' }}>
+          <FormControl
+            type="search"
+            placeholder="Search ESB_LOG (MSISDN, File ID, Transaction ID)"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            onKeyDown={handleKeyPress}
+            className="border-0 shadow-none px-3 py-2"
+            style={{ borderRadius: '25px 0 0 25px' }}
+          />
+          <button type="button" className="btn btn-light bg-white border-0 px-3 text-danger" onClick={() => {
+              if (query.trim()) navigate(`/search?query=${encodeURIComponent(query.trim())}`);
+            }} style={{ borderRadius: '0 25px 25px 0' }}>
+            <span style={{ fontWeight: 'bold' }}>&#128269;</span>
+          </button>
+        </div>
       </Form>
 
       {/* Right: User icon dropdown */}
@@ -53,20 +70,22 @@ const HeadBar = ({ onToggleSidebar, onLogout }) => {
   );
 };
 
-/* ---------------- User Icon Dropdown ---------------- */
 const UserDropdown = ({ onLogout }) => {
   return (
     <Dropdown align="end">
       <Dropdown.Toggle
         as="div"
-        className="p-0 border-0 bg-transparent"
-        style={{ cursor: "pointer", fontSize: "1.6rem", color: "black" }}
+        className="p-0 border-0 bg-transparent d-flex align-items-center gap-2"
+        style={{ cursor: "pointer", color: "white" }}
       >
-        <FaUserCircle />
+        <span className="d-none d-md-inline fw-semibold small">Admin</span>
+        <FaUserCircle style={{ fontSize: "2rem" }} />
       </Dropdown.Toggle>
 
-      <Dropdown.Menu>
-        <Dropdown.Item onClick={onLogout}>Logout</Dropdown.Item>
+      <Dropdown.Menu className="shadow-sm border-0 mt-2 rounded-3">
+        <Dropdown.Item onClick={onLogout} className="text-danger fw-bold d-flex align-items-center gap-2">
+           Logout
+        </Dropdown.Item>
       </Dropdown.Menu>
     </Dropdown>
   );

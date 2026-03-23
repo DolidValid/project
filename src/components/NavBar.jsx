@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { FaCogs, FaUser, FaSyncAlt, FaPhone, FaSignal } from "react-icons/fa";
+import { FaCogs, FaUser, FaSyncAlt, FaPhone, FaSignal, FaHistory } from "react-icons/fa";
 import { FaFileContract, FaSimCard } from "react-icons/fa6";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./NavBarStyle.css";
@@ -56,7 +56,7 @@ function NavBar({ isOpen, onClose }) {
               <li
                 className={
                   activeSubmenu === "SetContractStatus" ? "active" : ""
-                } // ✅ highlight
+                }
                 onClick={() =>
                   handleSubmenuClick(
                     "SetContractStatus",
@@ -64,7 +64,7 @@ function NavBar({ isOpen, onClose }) {
                   )
                 }
               >
-                <span className="me-2 text-danger">SetContractStatus</span>
+                <span className="me-2">SetContractStatus</span>
               </li>
               <li
                 className={activeSubmenu === "CreateContract" ? "active" : ""}
@@ -72,7 +72,7 @@ function NavBar({ isOpen, onClose }) {
                   handleSubmenuClick("CreateContract", "/create-contract")
                 }
               >
-                <span className="me-2 text-danger">CreateContract</span>
+                <span className="me-2">CreateContract</span>
               </li>
             </ul>
           )}
@@ -86,12 +86,12 @@ function NavBar({ isOpen, onClose }) {
           {activeMenu === "Services" && (
             <ul className="submenu list-unstyled ms-3">
               <li
-                className={activeSubmenu === "Activation 4g" ? "active" : ""} // ✅ highlight
+                className={activeSubmenu === "Activation 4g" ? "active" : ""}
                 onClick={() =>
                   handleSubmenuClick("Activation 4g", "/activation3G")
                 }
               >
-                <FaSignal className="me-2 text-danger" /> Activation 4G
+                <FaSignal className="me-2 icon-submenu" /> Activation 4G
               </li>
             </ul>
           )}
@@ -109,6 +109,24 @@ function NavBar({ isOpen, onClose }) {
           <li>
             <FaPhone className="icon" /> <span>Simulate first call</span>
           </li>
+          <li
+            className={activeMenu === "History" ? "active" : ""}
+            onClick={() => handleMenuClick("History")}
+          >
+            <FaHistory className="icon" /> <span>History</span>
+          </li>
+          {activeMenu === "History" && (
+            <ul className="submenu list-unstyled ms-3">
+              <li
+                className={activeSubmenu === "BatchHistory" ? "active" : ""}
+                onClick={() =>
+                  handleSubmenuClick("BatchHistory", "/batch-history")
+                }
+              >
+                <span className="me-2">Batch History</span>
+              </li>
+            </ul>
+          )}
         </ul>
       )}
     </div>
