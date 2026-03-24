@@ -93,14 +93,23 @@ const Search = () => {
   };
 
   const getPaginatedData = () => {
-    if (!Array.isArray(result)) return [];
+    const actualResults = Array.isArray(result) ? result : (result?.transactionResults || []);
+    if (actualResults.length === 0) return [];
+    
+    // If backend already paginated, just return it
+    if (result.pagination && actualResults.length <= rowsPerPage) {
+       return actualResults;
+    }
+
     const startIndex = (currentPage - 1) * rowsPerPage;
-    return result.slice(startIndex, startIndex + rowsPerPage);
+    return actualResults.slice(startIndex, startIndex + rowsPerPage);
   };
 
   const renderPagination = () => {
-    if (!Array.isArray(result)) return null;
-    const totalPages = Math.ceil(result.length / rowsPerPage);
+    const actualResults = Array.isArray(result) ? result : (result?.transactionResults || []);
+    const totalRecords = Array.isArray(result) ? result.length : (result?.pagination?.totalRecords || actualResults.length);
+    const totalPages = Array.isArray(result) ? Math.ceil(totalRecords / rowsPerPage) : (result?.pagination?.totalPages || Math.ceil(totalRecords / rowsPerPage));
+    
     if (totalPages <= 1) return null;
 
     return (
@@ -127,7 +136,13 @@ const Search = () => {
   };
 
   const renderTable = () => {
-    if (!result || result.length === 0) return null;
+    if (!result) return null;
+    
+    // Support both old array format and new object format with pagination
+    const actualResults = Array.isArray(result) ? result : (result.transactionResults || []);
+    
+    if (actualResults.length === 0) return null;
+
     const paginatedData = getPaginatedData();
 
     return (
@@ -135,7 +150,9 @@ const Search = () => {
          <div className="card-header bg-white p-4 border-bottom d-flex justify-content-between align-items-center">
              <div>
                 <h5 className="mb-0 fw-bold">Transaction Results</h5>
-                <span className="text-muted small">{result.length} matches found in ESB_LOG</span>
+                <span className="text-muted small">
+                  {Array.isArray(result) ? result.length : (result.pagination?.totalRecords || actualResults.length)} matches found in ESB_LOG
+                </span>
              </div>
              <button className="btn btn-outline-secondary d-flex align-items-center gap-2" onClick={() => triggerSearch(searchInput)}>
                 <ArrowRepeat /> Refresh List
@@ -165,10 +182,10 @@ const Search = () => {
                     </Badge>
                   </td>
                   <td className="small" style={{ maxWidth: '300px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                    {r.PROCESS_ADDITION_MSG || r.MAIN_INFO || '-'}
+                    {r.PROCESS_ADDITION_MSG || r.MAIN_INFO || r.MESSAGE || r.mainInfo || '-'}
                   </td>
-                  <td><Badge bg="light" text="dark" className="border shadow-sm">{r.TRACE_IN_STEP || '-'}</Badge></td>
-                  <td className="small text-muted text-nowrap">{r.STATUS_DATE || r.CREATION_DATE || '-'}</td>
+                  <td><Badge bg="light" text="dark" className="border shadow-sm">{r.TRACE_IN_STEP || r.STEP || r.step || r.trace_in_step || '-'}</Badge></td>
+                  <td className="small text-muted text-nowrap">{r.STATUS_DATE || r.CREATION_DATE || r.DATE || r.date || '-'}</td>
                 </tr>
               ))}
             </tbody>
