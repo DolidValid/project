@@ -2,12 +2,15 @@ import { useState } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
 import NavBar from "./NavBar";
 import HeadBar from "./HeadBar";
+import { useAuth } from "../context/AuthContext";
 
 const MainLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const navigate = useNavigate();
+  const { logout } = useAuth();
 
   const handleLogout = () => {
+    logout();
     navigate("/");
   };
 

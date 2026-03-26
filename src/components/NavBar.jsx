@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { FaCogs, FaUser, FaSyncAlt, FaPhone, FaSignal, FaHistory } from "react-icons/fa";
+import { FaCogs, FaUser, FaSyncAlt, FaPhone, FaSignal, FaHistory, FaListAlt } from "react-icons/fa";
 import { FaFileContract, FaSimCard } from "react-icons/fa6";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./NavBarStyle.css";
@@ -117,6 +117,14 @@ function NavBar({ isOpen, onClose }) {
           </li>
           {activeMenu === "History" && (
             <ul className="submenu list-unstyled ms-3">
+              <li
+                className={activeSubmenu === "BatchQueue" ? "active" : ""}
+                onClick={() =>
+                  handleSubmenuClick("BatchQueue", "/batch-queue")
+                }
+              >
+                <FaListAlt className="me-2 icon-submenu" /> Batch Queue
+              </li>
               <li
                 className={activeSubmenu === "BatchHistory" ? "active" : ""}
                 onClick={() =>

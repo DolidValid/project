@@ -1,4 +1,5 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import { AuthProvider, useAuth } from "./context/AuthContext";
 
 import MainLayout from "./components/MainLayout";
 import LoginPage from "./pages/LoginPage";
@@ -13,14 +14,29 @@ import Search from "./components/Search";
 import Activation3G from "./pages/Services/Activation3g";
 import ResultBatchPage from "./pages/ResultBatchPage";
 import BatchHistory from "./pages/BatchHistory";
+import BatchQueue from "./pages/BatchQueue";
 
-function App() {
+
+// A simple wrapper for protected routes
+const ProtectedRoute = ({ children }) => {
+  const { isAuthenticated } = useAuth();
+  return isAuthenticated ? children : <Navigate to="/" />;
+};
+
+function AppContent() {
+  const { isAuthenticated } = useAuth();
+
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<LoginPage />} />
+        {/* Only show Login if NOT authenticated, otherwise redirect home */}
+        <Route 
+          path="/" 
+          element={!isAuthenticated ? <LoginPage /> : <Navigate to="/home" />} 
+        />
 
-        <Route element={<MainLayout />}>
+        {/* Protect internal routes */}
+        <Route element={<ProtectedRoute><MainLayout /></ProtectedRoute>}>
           <Route path="/InfoFile" element={<InfoFile />} />
           <Route path="/Search" element={<Search />} />
           <Route path="/ImportBatch" element={<ImportBatch />} />
@@ -36,9 +52,18 @@ function App() {
           />
           <Route path="/batch-results/:fileId" element={<ResultBatchPage />} />
           <Route path="/batch-history" element={<BatchHistory />} />
+          <Route path="/batch-queue" element={<BatchQueue />} />
         </Route>
       </Routes>
     </Router>
+  );
+}
+
+function App() {
+  return (
+    <AuthProvider>
+      <AppContent />
+    </AuthProvider>
   );
 }
 
