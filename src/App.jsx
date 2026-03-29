@@ -14,7 +14,6 @@ import Search from "./components/Search";
 import Activation3G from "./pages/Services/Activation3g";
 import ResultBatchPage from "./pages/ResultBatchPage";
 import BatchHistory from "./pages/BatchHistory";
-import BatchQueue from "./pages/BatchQueue";
 
 
 // A simple wrapper for protected routes
@@ -52,7 +51,6 @@ function AppContent() {
           />
           <Route path="/batch-results/:fileId" element={<ResultBatchPage />} />
           <Route path="/batch-history" element={<BatchHistory />} />
-          <Route path="/batch-queue" element={<BatchQueue />} />
         </Route>
       </Routes>
     </Router>

@@ -118,20 +118,12 @@ function NavBar({ isOpen, onClose }) {
           {activeMenu === "History" && (
             <ul className="submenu list-unstyled ms-3">
               <li
-                className={activeSubmenu === "BatchQueue" ? "active" : ""}
-                onClick={() =>
-                  handleSubmenuClick("BatchQueue", "/batch-queue")
-                }
-              >
-                <FaListAlt className="me-2 icon-submenu" /> Batch Queue
-              </li>
-              <li
                 className={activeSubmenu === "BatchHistory" ? "active" : ""}
                 onClick={() =>
                   handleSubmenuClick("BatchHistory", "/batch-history")
                 }
               >
-                <span className="me-2">Batch History</span>
+                <span className="me-2 text-dark">Batch History</span>
               </li>
             </ul>
           )}

@@ -175,6 +175,11 @@ const ImportBatch = ({ type, fileId, executionDate }) => {
           status: "success",
         }));
         setRowStatuses(successStatuses);
+        
+        // Automatically navigate to batch results after a short delay to let the user see the success
+        setTimeout(() => {
+          navigate(`/batch-results/${encodeURIComponent(phoneFromInfoFile)}`);
+        }, 1500);
       } else {
         const errData = await res.json();
         setError(
