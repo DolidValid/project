@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Batch App Orchestration - Full Overview</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap');
+        body { font-family: 'Roboto', 'Segoe UI', sans-serif; line-height: 1.8; color: #1a1a1a; max-width: 1200px; margin: 40px auto; padding: 20px; background-color: #f5f5f5; }
+        .slide { background: white; padding: 50px; margin-bottom: 60px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); border-top: 5px solid #cc0000; position: relative;}
+        .logos { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
+        .dcs-logo { height: 60px; }
+        .ooredoo-logo { height: 120px; }
+        h1 { color: #d32f2f; font-size: 3.5em; text-align: center; border-bottom: 4px solid #cc0000; padding-bottom: 20px; margin-bottom: 0px; }
+        h2 { color: #b71c1c; border-left: 6px solid #b71c1c; padding-left: 20px; margin-top: 40px; }
+        .author { text-align: center; font-weight: bold; font-size: 1.5em; color: #666; margin-top: 20px; text-transform: uppercase; letter-spacing: 2px;}
+        .status-grid { display: grid; grid-template-columns: 1fr 165a2517865f8; gap: 30px; margin-top: 30px; }
+        .module-card { background: #fffbe6; border: 2px solid #ffe58f; padding: 25px; border-radius: 12px; }
+        .module-card h3 { color: #d48806; border-bottom: 1px solid #ffe58f; padding-bottom: 10px; margin-top: 0; }
+        .tech-box { background: #f0f5ff; border: 2px solid #adc6ff; padding: 20px; border-radius: 12px; height: 100%; }
+        .tech-box h3 { color: #2f54eb; margin-top: 0; }
+        .feature-img { max-width: 100%; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); border: 1px solid #eee; margin: 25px auto; display: block; }
+        figcaption { text-align: center; font-style: italic; color: #777; font-weight: bold; margin-bottom: 30px;}
+        .details-list { column-count: 2; list-style-type: none; padding: 0; }
+        .details-list li::before { content: "⚡ "; }
+        .details-list li { margin-bottom: 10px; font-weight: 500;}
+        footer { text-align: center; color: #aaa; margin-top: 80px; font-weight: bold; border-top: 1px solid #ddd; padding-top: 30px; }
+    </style>
+</head>
+<body>
+    <div class="slide">
+        <div class="logos">
+            <img class="dcs-logo" src="logos/dcs_logo.jpg" alt="DCS Logo">
+            <img class="ooredoo-logo" src="logos/ooredoo_logo.png" alt="Ooredoo Logo">
+        </div>
+        <h1>Batch App Presentation</h1>
+        <p class="author">Designed and implemented by Brahamia Oualid</p>
+        <p style="text-align: center; color: #cc0000; font-weight: bold;">Professional Orchestration Hub for Ooredoo Algeria ESB Services</p>
+    </div>
+
+    <div class="slide">
+        <h2>🏗️ System Architecture Details</h2>
+        <div class="status-grid">
+            <div class="tech-box">
+                <h3>Backend Execution Hub (Node.js)</h3>
+                <ul>
+                    <li><strong>Service-Oriented Design</strong>: Modular API architecture for scalability.</li>
+                    <li><strong>Oracle DB Persistence</strong>: Heavy audit logging using optimized connection pooling.</li>
+                    <li><strong>Asynchronous Throttling</strong>: Integrated node-cron worker to maintain ESB load limits.</li>
+                    <li><strong>Security Layer</strong>: Middleware-based JWT token validation for every request.</li>
+                    <li><strong>SOAP Integration</strong>: Native XML-based communication with the Enterprise Service Bus.</li>
+                </ul>
+            </div>
+            <div class="tech-box">
+                <h3>Frontend Orchestrator (React 18)</h3>
+                <ul>
+                    <li><strong>State Management</strong>: Centralized Context API for global session tracking.</li>
+                    <li><strong>UI Componentry</strong>: PrimeReact for advanced real-time data table visualization.</li>
+                    <li><strong>Modular Pages</strong>: Lazy-loading of service routes (SetStatus, CreateContract).</li>
+                    <li><strong>Responsive Grid</strong>: Bootstrap based layout for multi-device support.</li>
+                    <li><strong>Live Progress</strong>: Webhook/Polling mechanism for background job progress.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="slide">
+        <h2>🚀 Working Service Modules (Alpha v1.0)</h2>
+        <div class="status-grid">
+            <div class="module-card">
+                <h3>✅ 1. Create Batch Onboarding</h3>
+                <p>Designed for the massive injection of new subscriber profiles directly into the core network.</p>
+                <ul>
+                    <li><strong>Smart File Engine</strong>: Automatic validation of MSISDN ranges & file structure (.xlsx/.csv).</li>
+                    <li><strong>ESB Task Queuing</strong>: Triggers parallel contract creation requests.</li>
+                    <li><strong>Error Handing</strong>: Maps ESB internal errors to user-friendly messages.</li>
+                </ul>
+            </div>
+            <div class="module-card">
+                <h3>✅ 2. Set Contract Status Hub</h3>
+                <p>Critical lifecycle management for entire subscriber segments.</p>
+                <ul>
+                    <li><strong>Operations</strong>: Activate, Suspend, Deactivate, or Reactive in bulk.</li>
+                    <li><strong>Throttling Engine</strong>: Ensures ESB is not overwhelmed during 100k+ record batches.</li>
+                    <li><strong>Progress Control</strong>: Built-in <em>Pause-Resume-Cancel</em> job flow.</li>
+                </ul>
+            </div>
+        </div>
+        <p style="text-align:center; color: #888; margin-top: 30px; font-weight: bold;"><i>🛠️ NEXT RELEASES: Rate-Plan Modification, 3G Service Activations & Global KPI Dashboard.</i></p>
+    </div>
+
+    <div class="slide">
+        <h2>🔐 1. System Access & JWT Protocol</h2>
+        <p>A secure portal ensures all bulk operations are attributed to an authenticated user for full non-repudiation.</p>
+        <img class="feature-img" src="screenshots/login.png">
+        <figcaption>Figure 1 : Secure Gateway & Session Persistency Layer.</figcaption>
+    </div>
+
+    <div class="slide">
+        <h2>📥 2. Bulk Data Processing Console</h2>
+        <p>The console enables asynchronous file upload. The backend parses data in the background, minimizing UI blockages.</p>
+        <img class="feature-img" src="screenshots/import.png">
+        <figcaption>Figure 2 : Dynamic Batch Initiation Manager.</figcaption>
+    </div>
+
+    <div class="slide">
+        <h2>📊 3. Full Transactional Audit (ESB Diagnostics)</h2>
+        <p>Each transaction record displays the raw ESB response, status code, and precise execution timestamp.</p>
+        <img class="feature-img" src="screenshots/result.png">
+        <figcaption>Figure 3 : Global transactional audit logs with individual failure diagnostics.</figcaption>
+    </div>
+
+    <div class="slide">
+        <h2>📜 4. Global search & Audit History Hub</h2>
+        <p>Persistent historical storage ensures compliance. The global search allows instant MSISDN-to-Batch lookups across all historical records.</p>
+        <img class="feature-img" style="float: left; width: 48%; margin-right: 4%;" src="screenshots/history.png">
+        <img class="feature-img" style="float: left; width: 48%;" src="screenshots/search.png">
+        <div style="clear: both;"></div>
+        <figcaption>Figure 4 & 5 : Persistent Audit History & Global MSISDN Lookup System.</figcaption>
+    </div>
+
+    <footer>
+        DESIGNED AND IMPLEMENTED BY BRAHAMIA OUALID © 2026<br>
+        ESB BATCH APP ORCHESTRATION - v1.0 ENTERPRISE RELEASE
+    </footer>
+</body>
+</html>
