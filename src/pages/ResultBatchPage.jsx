@@ -14,7 +14,7 @@ import {
   Files
 } from "react-bootstrap-icons";
 
-const API_BASE = "http://localhost:5000/api/users";
+const API_BASE = "/api/users";
 
 const ResultBatchPage = () => {
   const { fileId } = useParams();
@@ -39,7 +39,7 @@ const ResultBatchPage = () => {
 
     try {
       const token = getToken();
-      const res = await fetch("http://localhost:5000/api/users/resultBatch", {
+      const res = await fetch("/api/users/resultBatch", {
         method: "POST",
         headers: { 
           "Content-Type": "application/json",

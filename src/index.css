@@ -13,10 +13,12 @@
   box-sizing: border-box;
 }
 
-body {
-  margin: 0;
-  min-width: 320px;
+.app {
+  display: flex;
   min-height: 100vh;
+  width: 100%;
+  margin: 0;
+  padding: 0;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -25,4 +27,31 @@ h1, h2, h3, h4, h5, h6 {
 
 button {
   font-family: inherit;
+}
+
+/* Ooredoo Styled Pagination */
+.custom-pagination .page-link {
+  color: #ed1c24;
+  border: none;
+  background-color: transparent;
+  padding: 0.5rem 0.8rem;
+  margin: 0 2px;
+  border-radius: 8px !important;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.custom-pagination .page-item.active .page-link {
+  background-color: #ed1c24 !important;
+  color: white !important;
+  box-shadow: 0 4px 10px rgba(237, 28, 36, 0.2);
+}
+
+.custom-pagination .page-link:hover:not(.active) {
+  background-color: rgba(237, 28, 36, 0.05);
+  color: #b31217;
+}
+
+.custom-pagination .page-item.disabled .page-link {
+  color: #ccc;
 }

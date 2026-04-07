@@ -51,7 +51,7 @@ const ImportBatch = ({ type, fileId, executionDate }) => {
       "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
       "application/vnd.ms-excel",
     ];
-    const maxSize = 2 * 1024 * 1024;
+    const maxSize = 14 * 1024 * 1024;
 
     if (!validTypes.includes(selectedFile.type)) {
       setError(
@@ -160,11 +160,11 @@ const ImportBatch = ({ type, fileId, executionDate }) => {
 
     try {
       const token = localStorage.getItem("token");
-      const res = await fetch("http://localhost:5000/api/users/upload-batch", {
+      const res = await fetch("/api/users/upload-batch", {
         method: "POST",
-        headers: { 
+        headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify(masterPayload),
       });
@@ -175,7 +175,7 @@ const ImportBatch = ({ type, fileId, executionDate }) => {
           status: "success",
         }));
         setRowStatuses(successStatuses);
-        
+
         // Automatically navigate to batch results after a short delay to let the user see the success
         setTimeout(() => {
           navigate(`/batch-results/${encodeURIComponent(phoneFromInfoFile)}`);

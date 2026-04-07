@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Table, Spinner, Badge, Button, Card, Container, ProgressBar, OverlayTrigger, Tooltip } from "react-bootstrap";
 import { FaHistory, FaTrash, FaEye, FaSync, FaPause, FaPlay, FaBan } from "react-icons/fa";
 
-const API_BASE = "http://localhost:5000/api/users";
+const API_BASE = "/api/users";
 
 const BatchHistory = () => {
   const [history, setHistory] = useState([]);

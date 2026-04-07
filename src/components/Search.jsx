@@ -10,7 +10,6 @@ const Search = () => {
 
   const urlQuery = new URLSearchParams(location.search).get("query") || "";
 
-  const [searchInput, setSearchInput] = useState(urlQuery);
   const [result, setResult] = useState(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -56,7 +55,7 @@ const Search = () => {
 
     try {
       const token = localStorage.getItem("token");
-      const res = await fetch("http://localhost:5000/api/users/Search", {
+      const res = await fetch("/api/users/Search", {
         method: "POST",
         headers: { 
           "Content-Type": "application/json",
@@ -87,14 +86,7 @@ const Search = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [urlQuery]);
 
-  const handleSearchSubmit = (e) => {
-    e.preventDefault();
-    if (searchInput !== urlQuery) {
-       navigate(`/search?query=${encodeURIComponent(searchInput.trim())}`);
-    } else {
-       triggerSearch(searchInput);
-    }
-  };
+
 
   const getPaginatedData = () => {
     const actualResults = Array.isArray(result) ? result : (result?.transactionResults || []);
@@ -116,21 +108,44 @@ const Search = () => {
     
     if (totalPages <= 1) return null;
 
+    const items = [];
+    const maxVisibleLines = 5;
+    let startPage = Math.max(1, currentPage - Math.floor(maxVisibleLines / 2));
+    let endPage = Math.min(totalPages, startPage + maxVisibleLines - 1);
+
+    if (endPage - startPage + 1 < maxVisibleLines) {
+      startPage = Math.max(1, endPage - maxVisibleLines + 1);
+    }
+
+    if (startPage > 1) {
+      items.push(<Pagination.First key="first" onClick={() => setCurrentPage(1)} />);
+      items.push(<Pagination.Ellipsis key="start-ellipsis" disabled />);
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+      items.push(
+        <Pagination.Item
+          key={i}
+          active={i === currentPage}
+          onClick={() => setCurrentPage(i)}
+        >
+          {i}
+        </Pagination.Item>
+      );
+    }
+
+    if (endPage < totalPages) {
+      items.push(<Pagination.Ellipsis key="end-ellipsis" disabled />);
+      items.push(<Pagination.Last key="last" onClick={() => setCurrentPage(totalPages)} />);
+    }
+
     return (
-      <Pagination className="mt-4 justify-content-center custom-pagination">
+      <Pagination className="mt-2 justify-content-center custom-pagination">
         <Pagination.Prev 
           disabled={currentPage === 1} 
           onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
         />
-        {[...Array(totalPages)].map((_, i) => (
-          <Pagination.Item
-            key={i}
-            active={i + 1 === currentPage}
-            onClick={() => setCurrentPage(i + 1)}
-          >
-            {i + 1}
-          </Pagination.Item>
-        ))}
+        {items}
         <Pagination.Next 
           disabled={currentPage === totalPages} 
           onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
@@ -158,7 +173,7 @@ const Search = () => {
                   {Array.isArray(result) ? result.length : (result.pagination?.totalRecords || actualResults.length)} matches found in ESB_LOG
                 </span>
              </div>
-             <button className="btn btn-outline-secondary d-flex align-items-center gap-2" onClick={() => triggerSearch(searchInput)}>
+             <button className="btn btn-outline-secondary d-flex align-items-center gap-2" onClick={() => triggerSearch(urlQuery)}>
                 <ArrowRepeat /> Refresh List
              </button>
          </div>
@@ -212,34 +227,12 @@ const Search = () => {
               <LuSearch size={32} />
             </div>
             <h2 className="fw-bold mb-2">Global Transaction Search</h2>
-            <p className="text-muted">Search directly within the ESB_LOG database by MSISDN, File ID, or Transaction ID.</p>
-          </div>
-
-          <div className="card shadow-lg border-0 rounded-4 overflow-hidden mb-5">
-            <div className="card-body p-4 bg-white p-md-5">
-              <form onSubmit={handleSearchSubmit}>
-                <div className="input-group input-group-lg">
-                  <span className="input-group-text bg-white border-end-0 border-danger border-2 text-danger px-4">
-                    <LuSearch />
-                  </span>
-                  <input
-                    type="text"
-                    className="form-control border-start-0 border-danger border-2 shadow-none"
-                    placeholder="Enter MSISDN, File ID, or Transaction UUID..."
-                    value={searchInput}
-                    onChange={(e) => setSearchInput(e.target.value)}
-                    style={{ fontSize: '1.2rem', padding: '1rem', borderLeftColor: 'transparent' }}
-                  />
-                  <button 
-                    className="btn btn-danger px-5 fw-bold text-uppercase tracking-wider" 
-                    type="submit" 
-                    style={{ background: 'var(--ooredoo-red, #ed1c24)', borderColor: 'var(--ooredoo-red, #ed1c24)' }}
-                  >
-                    {loading ? <Spinner size="sm" /> : "Search"}
-                  </button>
-                </div>
-              </form>
-            </div>
+            <p className="text-muted">
+              {urlQuery 
+                ? <>Showing results for: <span className="fw-bold text-danger">{urlQuery}</span></>
+                : "Search directly within the ESB_LOG database using the search bar above."
+              }
+            </p>
           </div>
 
           {error && (
