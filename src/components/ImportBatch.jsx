@@ -35,12 +35,14 @@ const ImportBatch = ({ type, fileId, executionDate }) => {
   const [error, setError] = useState("");
   const [isDragActive, setIsDragActive] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
 
   const handleClear = () => {
     setFile(null);
     setPreviewData([]);
     setRowStatuses([]);
     setError("");
+    setShowConfirm(false);
   };
 
   const handleFile = (selectedFile) => {
@@ -110,6 +112,7 @@ const ImportBatch = ({ type, fileId, executionDate }) => {
 
         setPreviewData(jsonData);
         setRowStatuses([]);
+        setShowConfirm(false);
       } catch (err) {
         setError("Error reading Excel file. Please check the file format.");
       }
@@ -122,8 +125,18 @@ const ImportBatch = ({ type, fileId, executionDate }) => {
     handleFile(selectedFile);
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
+    if (!file || previewData.length < 2) {
+      setError("Please select a valid file with data before uploading.");
+      return;
+    }
+    setShowConfirm(true);
+  };
+
+  const handleConfirmRun = async () => {
+    setShowConfirm(false);
+
     if (!file || previewData.length < 2) {
       setError("Please select a valid file with data before uploading.");
       return;
@@ -318,8 +331,40 @@ const ImportBatch = ({ type, fileId, executionDate }) => {
           </div>
         )}
 
+        {/* Confirmation Section */}
+        {showConfirm && previewData.length >= 2 && (
+          <div className="alert alert-info shadow-sm mt-4 border-0">
+            <h5 className="alert-heading fw-bold mb-3 d-flex align-items-center">
+              <LuCheckCircle className="me-2 text-primary" size={24} />
+              Confirm Batch Execution
+            </h5>
+            <div className="d-flex flex-column gap-2 mb-4">
+              <div className="d-flex align-items-center">
+                <span className="text-muted" style={{ width: "150px" }}>Operation Service:</span>
+                <Badge bg="primary">{type}</Badge>
+              </div>
+              <div className="d-flex align-items-center">
+                <span className="text-muted" style={{ width: "150px" }}>Total Records:</span>
+                <span className="fw-bold fs-5">{previewData.length - 1}</span>
+              </div>
+              <div className="d-flex align-items-center">
+                <span className="text-muted" style={{ width: "150px" }}>File Name:</span>
+                <strong>{file.name}</strong>
+              </div>
+            </div>
+            <div className="d-flex gap-3">
+              <button className="btn btn-success d-flex align-items-center gap-2" onClick={handleConfirmRun}>
+                <LuRocket /> Confirm & Run
+              </button>
+              <button className="btn btn-outline-secondary" onClick={() => setShowConfirm(false)}>
+                Cancel
+              </button>
+            </div>
+          </div>
+        )}
+
         {/* Data Preview */}
-        {previewData.length > 0 && (
+        {previewData.length > 0 && !showConfirm && (
           <div className="mt-5">
             <div className="d-flex align-items-center gap-2 mb-3">
               <div

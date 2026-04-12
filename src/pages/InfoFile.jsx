@@ -5,7 +5,6 @@ import RedButton from "../components/Button/PrimaryButton";
 
 const InfoFile = ({ onSuccess, prefix = "Set3GProfile_" }) => {
   const [executionDate, setExecutionDate] = useState("");
-  const [lineCount, setLineCount] = useState("");
   const [fileId, setFileId] = useState(""); // auto-generated
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
@@ -82,21 +81,6 @@ const InfoFile = ({ onSuccess, prefix = "Set3GProfile_" }) => {
                   className="form-control"
                   value={executionDate}
                   onChange={(e) => setExecutionDate(e.target.value)}
-                  required
-                />
-              </div>
-
-              {/* Nombre de lignes */}
-              <div className="mb-3">
-                <label htmlFor="lineCount" className="form-label">
-                  Nombre de lignes
-                </label>
-                <input
-                  id="lineCount"
-                  type="number"
-                  className="form-control"
-                  value={lineCount}
-                  onChange={(e) => setLineCount(e.target.value)}
                   required
                 />
               </div>

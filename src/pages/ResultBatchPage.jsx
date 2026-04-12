@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
-import { Table, Spinner, Badge, Pagination, ProgressBar } from "react-bootstrap";
+import { Table, Spinner, Badge, Pagination, ProgressBar, Modal, Button } from "react-bootstrap";
 import { 
   ArrowLeft as LuArrowLeft, 
   Download as LuDownload, 
@@ -8,10 +8,10 @@ import {
   PauseFill,
   PlayFill,
   StopFill,
-  Trash,
   Clock,
   CalendarCheck,
-  Files
+  Files,
+  ExclamationTriangleFill
 } from "react-bootstrap-icons";
 
 const API_BASE = "/api/users";
@@ -29,6 +29,9 @@ const ResultBatchPage = () => {
 
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 200;
+
+  const [showErrorModal, setShowErrorModal] = useState(false);
+  const [selectedTx, setSelectedTx] = useState(null);
 
   const getToken = () => localStorage.getItem("token");
 
@@ -69,9 +72,7 @@ const ResultBatchPage = () => {
   const handleAction = async (action) => {
     const confirmationMsg = action === 'cancel' 
       ? "Are you sure you want to cancel this batch? Processed records will remain."
-      : action === 'remove' 
-        ? "Are you sure you want to remove this batch? This will stop execution if it is running."
-        : null;
+      : null;
 
     if (confirmationMsg && !window.confirm(confirmationMsg)) {
       return;
@@ -79,8 +80,7 @@ const ResultBatchPage = () => {
     
     setActionLoading(true);
     try {
-      const controlAction = action === 'remove' ? 'cancel' : action;
-      const res = await fetch(`${API_BASE}/batch-control/${controlAction}`, {
+      const res = await fetch(`${API_BASE}/batch-control/${action}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -90,7 +90,7 @@ const ResultBatchPage = () => {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || data.message || `Failed to ${action}`);
-      alert(`Success: Batch ${action === 'remove' ? 'removed' : action + 'ed'}`);
+      alert(`Success: Batch ${action}ed`);
       await fetchResults(currentPage);
     } catch (err) {
       alert(`${action} failed: ${err.message}`);
@@ -142,11 +142,20 @@ const ResultBatchPage = () => {
     }
   };
 
+  const handleStatusClick = (record) => {
+    // Open modal for any status that has error or response data
+    if (record.STATUS === 'FAILED' || record.wsError || record.wsResponse || record.httpStatus) {
+      setSelectedTx(record);
+      setShowErrorModal(true);
+    }
+  };
+
   const batchStatus = resultsData?.batchInfo?.etat;
   const runtimeState = resultsData?.batchInfo?.runtimeState;
   const isRunning = batchStatus === 'IN_PROGRESS' && runtimeState !== 'paused';
   const isPaused = runtimeState === 'paused' || batchStatus === 'PAUSED';
   const isPending = batchStatus === 'PENDING';
+  const isProcessed = batchStatus === 'PROCESSED' || batchStatus === 'FINISHED';
   const progress = getProgress(resultsData?.batchInfo?.progress);
 
   return (
@@ -191,13 +200,7 @@ const ResultBatchPage = () => {
               <StopFill size={18} /> Cancel
             </button>
           )}
-          <button 
-            className="btn btn-outline-danger shadow-sm d-flex align-items-center gap-2"
-            onClick={() => handleAction('remove')}
-            disabled={actionLoading}
-          >
-            <Trash size={18} /> Remove
-          </button>
+          {/* Remove button has been deleted as requested */}
         </div>
       </div>
 
@@ -240,8 +243,8 @@ const ResultBatchPage = () => {
                     </div>
                   </div>
 
-                  {/* Progress Section */}
-                  {(isRunning || isPaused || batchStatus === 'FINISHED') && (
+                  {/* Progress Section - shows for running, paused, AND processed/finished batches */}
+                  {(isRunning || isPaused || isProcessed) && (
                     <div className="mt-4">
                       <div className="d-flex justify-content-between mb-2">
                         <span className="text-muted fw-bold small">Processing Status</span>
@@ -256,6 +259,22 @@ const ResultBatchPage = () => {
                         variant={isPaused ? "warning" : progress.percent === 100 ? "success" : "danger"}
                         style={{ height: 10, borderRadius: 10 }}
                       />
+                      {/* Execution Summary */}
+                      {resultsData?.batchInfo?.executionSummary && (
+                        <div className="d-flex gap-3 mt-2 small">
+                          <span className="text-success fw-bold">
+                            ✅ Success: {resultsData.batchInfo.executionSummary.success || 0}
+                          </span>
+                          <span className="text-danger fw-bold">
+                            ❌ Failed: {resultsData.batchInfo.executionSummary.failed || 0}
+                          </span>
+                          {resultsData.batchInfo.executionSummary.elapsedSeconds && (
+                            <span className="text-muted">
+                              ⏱ Duration: {resultsData.batchInfo.executionSummary.elapsedSeconds}s
+                            </span>
+                          )}
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
@@ -295,7 +314,7 @@ const ResultBatchPage = () => {
                     <th>Transaction ID</th>
                     <th>Status</th>
                     <th>Message</th>
-                    <th>Step</th>
+                    <th>Channel</th>
                     <th>Date</th>
                   </tr>
                 </thead>
@@ -308,9 +327,16 @@ const ResultBatchPage = () => {
                         <td>
                           <Badge 
                             bg={r.STATUS === 'SUCCESS' || r.STATUS === 'FINISHED' ? 'success' : r.STATUS === 'PENDING' ? 'warning' : 'danger'}
-                            style={{ borderRadius: 6 }}
+                            style={{ 
+                              borderRadius: 6, 
+                              cursor: (r.STATUS === 'FAILED' || r.wsError || r.wsResponse) ? 'pointer' : 'default',
+                              textDecoration: (r.STATUS === 'FAILED' || r.wsError) ? 'underline' : 'none'
+                            }}
+                            title={r.STATUS === 'FAILED' || r.wsError ? 'Click to see error details' : ''}
+                            onClick={() => handleStatusClick(r)}
                           >
                             {r.STATUS || 'UNKNOWN'}
+                            {(r.STATUS === 'FAILED' || r.wsError) && ' 🔍'}
                           </Badge>
                         </td>
                         <td className="small" style={{ maxWidth: '300px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
@@ -366,6 +392,114 @@ const ResultBatchPage = () => {
           </div>
         </>
       )}
+
+      {/* Error / Response Detail Modal */}
+      <Modal show={showErrorModal} onHide={() => setShowErrorModal(false)} size="lg" centered>
+        <Modal.Header closeButton style={{ background: '#f8d7da', borderBottom: '2px solid #dc3545' }}>
+          <Modal.Title className="fw-bold d-flex align-items-center gap-2">
+            <ExclamationTriangleFill className="text-danger" size={22} />
+            Transaction Error Details
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body className="p-4">
+          {selectedTx && (
+            <div>
+              {/* Header Info Row */}
+              <div className="row mb-3 pb-3 border-bottom">
+                <div className="col-md-4">
+                  <label className="text-muted small d-block mb-1">MSISDN</label>
+                  <strong className="text-danger fs-6">{selectedTx.msisdn || '-'}</strong>
+                </div>
+                <div className="col-md-4">
+                  <label className="text-muted small d-block mb-1">Transaction ID</label>
+                  <strong className="fs-6">{selectedTx.transactionId || selectedTx.TRANSACTION_ID || 'N/A'}</strong>
+                </div>
+                <div className="col-md-4">
+                  <label className="text-muted small d-block mb-1">Status</label>
+                  <Badge bg={selectedTx.STATUS === 'SUCCESS' || selectedTx.STATUS === 'FINISHED' ? 'success' : 'danger'}
+                         style={{ fontSize: '0.85rem', padding: '6px 12px' }}>
+                    {selectedTx.STATUS}
+                  </Badge>
+                  {selectedTx.httpStatus && (
+                    <Badge bg="dark" className="ms-2" style={{ fontSize: '0.85rem', padding: '6px 12px' }}>
+                      HTTP {selectedTx.httpStatus}
+                    </Badge>
+                  )}
+                </div>
+              </div>
+
+              {/* Error Message */}
+              {selectedTx.wsError && (
+                <div className="mb-3">
+                  <label className="text-danger small d-block mb-1 fw-bold">
+                    ❌ Error Message (HTTP / Network)
+                  </label>
+                  <div className="p-3 border border-danger rounded" style={{ background: '#fff5f5' }}>
+                    <code className="text-danger" style={{ fontSize: '13px', wordBreak: 'break-all' }}>
+                      {selectedTx.wsError}
+                    </code>
+                  </div>
+                </div>
+              )}
+
+              {/* Main Info / Additional Info */}
+              {(selectedTx.MAIN_INFO || selectedTx.PROCESS_ADDITION_MSG) && (
+                <div className="mb-3">
+                  <label className="text-muted small d-block mb-1 fw-bold">Main Info / Additional Message</label>
+                  <div className="p-2 bg-light border rounded small">
+                    {selectedTx.MAIN_INFO && <div><strong>Main:</strong> {selectedTx.MAIN_INFO}</div>}
+                    {selectedTx.PROCESS_ADDITION_MSG && <div><strong>Additional:</strong> {selectedTx.PROCESS_ADDITION_MSG}</div>}
+                  </div>
+                </div>
+              )}
+
+              {/* Step Info */}
+              {selectedTx.TRACE_IN_STEP && (
+                <div className="mb-3">
+                  <label className="text-muted small d-block mb-1 fw-bold">Channel</label>
+                  <Badge bg="secondary">{selectedTx.TRACE_IN_STEP}</Badge>
+                </div>
+              )}
+
+              {/* Full WS Response Body */}
+              {selectedTx.wsResponse && (
+                <div className="mb-0">
+                  <label className="text-muted small d-block mb-1 fw-bold">
+                    📋 Web Service Full Response (Exact Error from ESB)
+                  </label>
+                  <pre className="p-3 rounded overflow-auto" 
+                       style={{ 
+                         maxHeight: '350px', 
+                         fontSize: '12px', 
+                         background: '#1e1e1e', 
+                         color: '#d4d4d4',
+                         border: '1px solid #333',
+                         whiteSpace: 'pre-wrap',
+                         wordBreak: 'break-all'
+                       }}>
+                    {selectedTx.wsResponse}
+                  </pre>
+                </div>
+              )}
+
+              {/* Fallback message if no error details available */}
+              {!selectedTx.wsError && !selectedTx.wsResponse && selectedTx.STATUS === 'FAILED' && (
+                <div className="alert alert-warning mb-0">
+                  <ExclamationTriangleFill className="me-2" />
+                  No detailed error information is available for this transaction. 
+                  This may be a transaction processed before the error capturing was enabled.
+                </div>
+              )}
+            </div>
+          )}
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="outline-secondary" onClick={() => setShowErrorModal(false)}>
+            Close
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
     </div>
   );
 };

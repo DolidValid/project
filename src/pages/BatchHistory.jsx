@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Table, Spinner, Badge, Button, Card, Container, ProgressBar, OverlayTrigger, Tooltip } from "react-bootstrap";
-import { FaHistory, FaTrash, FaEye, FaSync, FaPause, FaPlay, FaBan } from "react-icons/fa";
+import { FaHistory, FaEye, FaSync, FaPause, FaPlay, FaBan } from "react-icons/fa";
 
 const API_BASE = "/api/users";
 
@@ -50,21 +50,7 @@ const BatchHistory = () => {
     }
   };
 
-  const handleDelete = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this batch from history? This will also delete the associated payload file.")) return;
-    
-    try {
-      const token = getToken();
-      const response = await fetch(`${API_BASE}/batch-history/${id}`, {
-        method: "DELETE",
-        headers: { "Authorization": `Bearer ${token}` }
-      });
-      if (!response.ok) throw new Error("Failed to delete batch");
-      setHistory(history.filter(item => item.id !== id));
-    } catch (err) {
-      alert("Delete failed: " + err.message);
-    }
-  };
+  // handleDelete removed — delete feature is no longer available
 
   const handleBatchAction = async (fileId, action) => {
     const key = `${fileId}-${action}`;
@@ -145,6 +131,7 @@ const BatchHistory = () => {
                     <th>Operation</th>
                     <th>Records</th>
                     <th>Progress</th>
+                    <th>Stats</th>
                     <th>Upload Date</th>
                     <th>Status</th>
                     <th className="text-center" style={{ minWidth: 220 }}>Actions</th>
@@ -187,6 +174,16 @@ const BatchHistory = () => {
                             ) : (
                               <span className="text-muted small">-</span>
                             )}
+                          </td>
+                          <td style={{ minWidth: 120 }}>
+                            <div className="d-flex flex-column gap-1">
+                              <Badge bg="success" style={{ fontSize: '0.7rem' }}>
+                                Success: {item.executionSummary?.success ?? item.successCount ?? 0}
+                              </Badge>
+                              <Badge bg="danger" style={{ fontSize: '0.7rem' }}>
+                                Fail: {item.executionSummary?.failed ?? item.failCount ?? 0}
+                              </Badge>
+                            </div>
                           </td>
                           <td className="text-muted small">
                             {new Date(item.uploadDate).toLocaleString()}
@@ -261,20 +258,7 @@ const BatchHistory = () => {
                                 </Button>
                               </OverlayTrigger>
 
-                              {/* Delete - only for completed/cancelled/errored */}
-                              {!active && (
-                                <OverlayTrigger placement="top" overlay={<Tooltip>Delete</Tooltip>}>
-                                  <Button 
-                                    variant="light" 
-                                    size="sm" 
-                                    className="text-danger"
-                                    onClick={() => handleDelete(item.id)}
-                                    style={{ borderRadius: 6, minWidth: 34 }}
-                                  >
-                                    <FaTrash size={12} />
-                                  </Button>
-                                </OverlayTrigger>
-                              )}
+                              {/* Delete feature has been removed */}
                             </div>
                           </td>
                         </tr>
