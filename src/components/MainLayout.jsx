@@ -1,18 +1,22 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
 import NavBar from "./NavBar";
 import HeadBar from "./HeadBar";
 import { useAuth } from "../context/AuthContext";
+import useSessionManager from "../hooks/useSessionManager";
 
 const MainLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const navigate = useNavigate();
-  const { logout } = useAuth();
+  const { logout, isAuthenticated } = useAuth();
 
-  const handleLogout = () => {
+  const handleLogout = useCallback(() => {
     logout();
     navigate("/");
-  };
+  }, [logout, navigate]);
+
+  // Auto-logout on tab close and after 15 min of inactivity
+  useSessionManager(handleLogout, isAuthenticated);
 
   return (
     <div className="d-flex flex-column" style={{ minHeight: "100vh" }}>
@@ -43,3 +47,4 @@ const MainLayout = () => {
 };
 
 export default MainLayout;
+

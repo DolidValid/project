@@ -54,7 +54,7 @@ const Search = () => {
     setCurrentPage(1); // Reset page on new search
 
     try {
-      const token = localStorage.getItem("token");
+      const token = sessionStorage.getItem("token");
       const res = await fetch("/api/users/Search", {
         method: "POST",
         headers: { 

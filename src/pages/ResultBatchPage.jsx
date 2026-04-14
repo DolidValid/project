@@ -33,7 +33,7 @@ const ResultBatchPage = () => {
   const [showErrorModal, setShowErrorModal] = useState(false);
   const [selectedTx, setSelectedTx] = useState(null);
 
-  const getToken = () => localStorage.getItem("token");
+  const getToken = () => sessionStorage.getItem("token");
 
   const fetchResults = async (page = 1, silent = false) => {
     if (!fileId) return;

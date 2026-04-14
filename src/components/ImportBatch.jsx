@@ -172,7 +172,7 @@ const ImportBatch = ({ type, fileId, executionDate }) => {
     };
 
     try {
-      const token = localStorage.getItem("token");
+      const token = sessionStorage.getItem("token");
       const res = await fetch("/api/users/upload-batch", {
         method: "POST",
         headers: {

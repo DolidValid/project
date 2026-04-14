@@ -18,16 +18,28 @@ const Activation3G = () => {
       {/* Step Wizard Container */}
       <div style={{ flex: 1, padding: "20px" }}>
         {step === 0 && (
-          <div className="d-flex flex-column justify-content-center align-items-center" style={{ height: "80%" }}>
-            <h2 className="mb-4">Activation 3G</h2>
-            <button className="btn btn-primary btn-lg" onClick={() => setStep(1)}>
+          <div
+            className="d-flex flex-column justify-content-center align-items-center"
+            style={{ height: "80%" }}
+          >
+            <h2 className="mb-4">Activation 5G</h2>
+            <button
+              className="btn btn-primary btn-lg"
+              onClick={() => setStep(1)}
+            >
               Start New Batch
             </button>
           </div>
         )}
-        {step === 1 && <InfoFile onSuccess={handleInfoSuccess} prefix="Set3GProfile_" />}
+        {step === 1 && (
+          <InfoFile onSuccess={handleInfoSuccess} prefix="Set3GProfile_" />
+        )}
         {step === 2 && (
-          <ImportBatch type="ACTIVATION_3G" fileId={fileId} executionDate={executionDate} />
+          <ImportBatch
+            type="ACTIVATION_3G"
+            fileId={fileId}
+            executionDate={executionDate}
+          />
         )}
       </div>
     </div>

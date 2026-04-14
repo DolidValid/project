@@ -12,7 +12,7 @@ const BatchHistory = () => {
   const [actionLoading, setActionLoading] = useState({});
   const navigate = useNavigate();
 
-  const getToken = () => localStorage.getItem("token");
+  const getToken = () => sessionStorage.getItem("token");
 
   const fetchHistory = async () => {
     setLoading(true);

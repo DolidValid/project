@@ -1,6 +1,14 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { FaCogs, FaUser, FaSyncAlt, FaPhone, FaSignal, FaHistory, FaListAlt } from "react-icons/fa";
+import {
+  FaCogs,
+  FaUser,
+  FaSyncAlt,
+  FaPhone,
+  FaSignal,
+  FaHistory,
+  FaListAlt,
+} from "react-icons/fa";
 import { FaFileContract, FaSimCard } from "react-icons/fa6";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./NavBarStyle.css";
@@ -91,7 +99,7 @@ function NavBar({ isOpen, onClose }) {
                   handleSubmenuClick("Activation 4g", "/activation3G")
                 }
               >
-                <FaSignal className="me-2 icon-submenu" /> Activation 4G
+                <FaSignal className="me-2 icon-submenu" /> Activation 5G
               </li>
             </ul>
           )}
