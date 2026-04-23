@@ -8,16 +8,20 @@ import {
   FaSignal,
   FaHistory,
   FaListAlt,
+  FaShieldAlt,
 } from "react-icons/fa";
 import { FaFileContract, FaSimCard } from "react-icons/fa6";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./NavBarStyle.css";
 import PropTypes from "prop-types";
+import { useAuth } from "../context/AuthContext";
 
 function NavBar({ isOpen, onClose }) {
   const [activeMenu, setActiveMenu] = useState("");
   const [activeSubmenu, setActiveSubmenu] = useState(""); // ✅ new state
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const isAdmin = user?.role === "admin";
 
   const handleMenuClick = (menuItem) => {
     setActiveMenu((prev) => (prev === menuItem ? "" : menuItem));
@@ -134,6 +138,16 @@ function NavBar({ isOpen, onClose }) {
                 <span className="me-2 text-dark">Batch History</span>
               </li>
             </ul>
+          )}
+
+          {/* Audit Log - Admin only */}
+          {isAdmin && (
+            <li
+              className={activeSubmenu === "AuditLog" ? "active" : ""}
+              onClick={() => handleSubmenuClick("AuditLog", "/audit")}
+            >
+              <FaShieldAlt className="icon" /> <span>Audit Log</span>
+            </li>
           )}
         </ul>
       )}

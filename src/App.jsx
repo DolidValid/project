@@ -14,12 +14,19 @@ import Search from "./components/Search";
 import Activation3G from "./pages/Services/Activation3g";
 import ResultBatchPage from "./pages/ResultBatchPage";
 import BatchHistory from "./pages/BatchHistory";
+import AuditPage from "./pages/AuditPage";
 
 
 // A simple wrapper for protected routes
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated } = useAuth();
   return isAuthenticated ? children : <Navigate to="/" />;
+};
+
+// Admin-only route wrapper — redirects non-admins to /home
+const AdminRoute = ({ children }) => {
+  const { user } = useAuth();
+  return user?.role === "admin" ? children : <Navigate to="/home" />;
 };
 
 function AppContent() {
@@ -51,6 +58,7 @@ function AppContent() {
           />
           <Route path="/batch-results/:fileId" element={<ResultBatchPage />} />
           <Route path="/batch-history" element={<BatchHistory />} />
+          <Route path="/audit" element={<AdminRoute><AuditPage /></AdminRoute>} />
         </Route>
       </Routes>
     </Router>

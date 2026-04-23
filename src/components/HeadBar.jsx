@@ -1,12 +1,14 @@
 import { useState } from "react";
-import { Navbar, Form, FormControl, Dropdown } from "react-bootstrap";
+import { Navbar, Form, FormControl, Dropdown, Badge } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { FaUserCircle } from "react-icons/fa";
 import PropTypes from "prop-types";
+import { useAuth } from "../context/AuthContext";
 
 const HeadBar = ({ onToggleSidebar, onLogout }) => {
   const [query, setQuery] = useState("");
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   const handleKeyPress = (e) => {
     if (e.key === "Enter") {
@@ -65,12 +67,13 @@ const HeadBar = ({ onToggleSidebar, onLogout }) => {
       </Form>
 
       {/* Right: User icon dropdown */}
-      <UserDropdown onLogout={onLogout} />
+      <UserDropdown onLogout={onLogout} user={user} />
     </Navbar>
   );
 };
 
-const UserDropdown = ({ onLogout }) => {
+const UserDropdown = ({ onLogout, user }) => {
+  const isAdmin = user?.role === "admin";
   return (
     <Dropdown align="end">
       <Dropdown.Toggle
@@ -78,11 +81,24 @@ const UserDropdown = ({ onLogout }) => {
         className="p-0 border-0 bg-transparent d-flex align-items-center gap-2"
         style={{ cursor: "pointer", color: "white" }}
       >
-        <span className="d-none d-md-inline fw-semibold small">Admin</span>
+        <div className="d-none d-md-flex align-items-center gap-2">
+          <span className="fw-semibold small">{user?.username || "User"}</span>
+          <Badge 
+            bg={isAdmin ? "warning" : "light"} 
+            text={isAdmin ? "dark" : "dark"}
+            style={{ fontSize: '0.65rem', padding: '2px 6px' }}
+          >
+            {isAdmin ? "ADMIN" : "USER"}
+          </Badge>
+        </div>
         <FaUserCircle style={{ fontSize: "2rem" }} />
       </Dropdown.Toggle>
 
       <Dropdown.Menu className="shadow-sm border-0 mt-2 rounded-3">
+        <Dropdown.Header className="small text-muted">
+          Signed in as <strong>{user?.username}</strong>
+        </Dropdown.Header>
+        <Dropdown.Divider />
         <Dropdown.Item onClick={onLogout} className="text-danger fw-bold d-flex align-items-center gap-2">
            Logout
         </Dropdown.Item>
@@ -98,6 +114,7 @@ HeadBar.propTypes = {
 
 UserDropdown.propTypes = {
   onLogout: PropTypes.func.isRequired,
+  user: PropTypes.object,
 };
 
 export default HeadBar;
